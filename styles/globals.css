@@ -1,4 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,700;1,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;300;400&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+.required {
+  color: #e01020;
+  font-size: 16px;
+  border: none;
+}
+
+#active-link {
+  border-left: solid 4px purple;
+  color: black;
+}
