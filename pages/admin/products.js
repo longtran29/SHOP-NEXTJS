@@ -5,7 +5,7 @@ function Products(props) {
     console.log("Da vao product");
   return (
     <div>
-      <h2>Danh sách products</h2>
+      <h2>Danh sách prods</h2>
     </div>
   );
 }
