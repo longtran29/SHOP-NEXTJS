@@ -13,4 +13,9 @@
 #active-link {
   border-left: solid 4px purple;
   color: black;
+  background-color:#FCFCFC;
+}
+
+.ant-btn-primary {
+  background-color: #1677ff;
 }

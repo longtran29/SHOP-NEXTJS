@@ -1,20 +1,27 @@
 import { AuthProvider } from "@/context/AuthContext";
 import "@/styles/globals.css";
+import "react-toastify/dist/ReactToastify.css";
 import Head from "next/head";
+import { ToastContainer } from "react-toastify";
+import {DataProvider} from "@/context/DataContext";
 
 export default function App(props) {
-  const { Component, pageProps,  title, keywords, description } = props;
+  const { Component, pageProps, title, keywords, description } = props;
   const getLayout = Component.getLayout || ((page) => <>{page}</>);
 
   return (
     <>
+      <ToastContainer />
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords} />
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AuthProvider>{getLayout(<Component {...pageProps} />)}</AuthProvider>;
+      <AuthProvider>
+        <DataProvider>{getLayout(<Component {...pageProps} />)}</DataProvider>
+      </AuthProvider>
+      ;
     </>
   );
 }

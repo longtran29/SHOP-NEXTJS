@@ -1,5 +1,5 @@
 import Layout from "@/layouts/Layout";
-import Authenticate from "@/components/auth/auth-form";
+import Authenticate from "@/components/Auth/auth-form";
 import AuthContext from "@/context/AuthContext";
 import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
@@ -7,11 +7,16 @@ import { useContext, useEffect } from "react";
 export default function Auth() {
   const { user } = useContext(AuthContext);
 
-  // console.log("Value user in Auth  " +JSON.stringify(user));
+  console.log("Value user in Auth  " +JSON.stringify(user));
   const router = useRouter();
 
   if (user) {
-    router.push("/");
+    if(user === 'ADMIN') {
+      router.push('/admin/dashboard')
+    }
+    else {
+      router.push('/')
+    }
     return null;
   }
 

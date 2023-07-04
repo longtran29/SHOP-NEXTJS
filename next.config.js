@@ -3,4 +3,9 @@ const nextConfig = {
   reactStrictMode: false,     // render once time
 }
 
-module.exports = nextConfig
+module.exports = {
+  reactStrictMode: true, 
+  images: {
+    domains: ['res.cloudinary.com'],
+  },
+}
