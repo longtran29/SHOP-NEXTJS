@@ -16,7 +16,8 @@ export default function Authenticate() {
     error && toast.error(error);
   }, [error]);
 
-  const loginSubmit = (e) => {
+  // console.log("User info global " + JSON.stringify(user));
+  const loginSubmit = async (e) => {
     e.preventDefault();
     login(account);
   };

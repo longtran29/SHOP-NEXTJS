@@ -52,10 +52,12 @@ export default function Header() {
               Logout
             </div>
           ) : (
-            <div className="flex bg-black text-white p-1 text-sm border-2 border-black hover:text-red-500 items-center justify-between hover:cursor-pointer">
-              <GoSignIn />
-
-              <Link href="/account/login">
+            <div>
+              <Link
+                href="/account/login"
+                className="flex bg-black text-white p-1 text-sm border-2 border-black hover:text-red-500 items-center justify-between hover:cursor-pointer"
+              >
+                <GoSignIn />
                 <h2>Login</h2>
               </Link>
             </div>

@@ -39,9 +39,7 @@ export function AuthProvider({ children }) {
 
     let data = await response.json();
 
-    if (response.ok) {
-      if (data.user === "ADMIN") window.location = "/admin/dashboard";
-      else window.location = "/";
+    if (response.ok) {       
       setUser(data.user);
       // setError(null);
     } else {

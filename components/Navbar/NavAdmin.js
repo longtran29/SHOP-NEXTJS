@@ -6,7 +6,7 @@ import Sidebar from "../Sidebar/Sidebar";
 function NavAdmin({ children }) {
   return (
     <div className="bg-white text-black p-6 shadow-md sticky">
-      <Image src={logo} />
+      <Image src={logo} alt="logo-icon" />
     </div>
   );
 }
