@@ -1,0 +1,298 @@
+import React, { Fragment, useContext, useState } from "react";
+import DataContext from "@/context/DataContext";
+import AdminLayout from "@/layouts/AdminLayout";
+import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
+import { Input, Modal, Select, Spin, Table } from "antd";
+import { MdDeleteOutline } from "react-icons/md";
+import { RxUpdate } from "react-icons/rx";
+import { toast } from "react-toastify";
+import { NEXT_API } from "@/config";
+import brand from "../api/brands/[brandId]";
+
+function Brands(props) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [state, setState] = useState({
+    brandName: "",
+    isLoading: false,
+    isUpdating: false,
+    status: false,
+    value: [],
+    updateBrandId: null,
+  });
+
+  const { value } = state;
+
+  const { listBrands, listCates, updateBrands } = useContext(DataContext);
+
+  const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
+
+  const { confirm } = Modal;
+
+  const Option = Select.Option;
+
+  // update brand
+  function updateBrand(brandId) {
+    setIsModalOpen(true);
+    setState({ ...state, isUpdating: true, updateBrandId: brandId });
+
+    const foundBrand = listBrands.find((brand) => brand.id === brandId);
+
+    setState((prevState) => ({
+      ...prevState,
+      brandName: foundBrand.name,
+      value: foundBrand.categories.map((cate) => ({
+        key: cate.id,
+        label: cate.name.toString(),
+        text: cate.name.toString(),
+      })),
+    }));
+  }
+
+  // handle delete
+  async function deleteBrand(brandId) {
+    confirm({
+      title: "Are you sure delete this brand?",
+      icon: <ExclamationCircleFilled />,
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        const deleteBrand = async () => {
+          const response = await fetch(`${NEXT_API}/api/brands/${brandId}`, {
+            method: "DELETE",
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            toast.error(data.message);
+          } else {
+            updateBrands(data.brands);
+            toast.success("Xoá thành công !");
+          }
+        };
+
+        deleteBrand();
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
+  }
+
+  // handle submit
+  const handleOk = async () => {
+    if (state.brandName === "") {
+      toast.error("Vui lòng nhập tên hãng !");
+      return;
+    } else if (value.length == 0) {
+      toast.error("Vui lòng chọn mặt hàng kinh doanh");
+      return;
+    }
+
+    if (!state.isUpdating) {
+      // dang them
+
+      const response = await fetch(`${NEXT_API}/api/brands`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          brandName: state.brandName,
+          cateIds: value.map((cate) => cate.key),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message);
+      } else {
+        updateBrands(data.brands);
+        toast.success("Đã thêm thành công !");
+      }
+    } else {
+      // dang cap nhat
+      const brandId = state.updateBrandId;
+      const response = await fetch(`${NEXT_API}/api/brands/${brandId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          brandName: state.brandName,
+          cateIds: value.map((cate) => cate.key),
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message);
+      } else {
+        updateBrands(data.brands);
+        toast.success("Cập nhật thành công !");
+      }
+    }
+
+    setIsModalOpen(false);
+    setState({
+      brandName: "",
+      isLoading: false,
+      isUpdating: false,
+      status: false,
+      updateBrandId: null,
+      selectedCates: null,
+      value: [],
+    });
+  };
+
+  // cancellation
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    if (state.isUpdating) {
+      setState({
+        brandName: "",
+        isLoading: false,
+        isUpdating: false,
+        status: false,
+        updateBrandId: null,
+        selectedCates: null,
+        value: [],
+      });
+    }
+  };
+
+  let options = [];
+
+  if (listCates.length > 0) {
+    options = listCates.map((cate) => ({
+      text: cate.name.toString(),
+      value: cate.id,
+    }));
+  }
+
+  // handle select categories
+  const handleChange = (value) => {
+    setState({ ...state, value: value });
+  };
+
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      sortOrder: "ascend",
+      sorter: (a, b) => {
+        return a.id - b.id > 0 ? 1 : -1;
+      },
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      responsive: ["sm"],
+    },
+
+    {
+      title: "Action",
+      responsive: ["sm"],
+      render: (_, record) => (
+        <div className="flex items-center">
+          <RxUpdate
+            onClick={() => updateBrand(record.id)}
+            className="hover:cursor-pointer hover:text-primary-700"
+          />
+
+          <MdDeleteOutline
+            className="text-red-400 hover:fill-primary-700 text-xl ml-6 hover:cursor-pointer"
+            onClick={() => deleteBrand(record.id)}
+          />
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <Fragment>
+      {state.isLoading ? (
+        <Spin
+          indicator={antIcon}
+          className="flex justify-center align-center items-center w-screen h-screen"
+        />
+      ) : (
+        <div className="p-10">
+          <div className="mb-4">
+            <button
+              className="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <svg
+                className="-ml-1 mr-2 h-6 w-6"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path>
+              </svg>
+              Add brands
+            </button>
+          </div>
+          <Table
+            columns={columns}
+            dataSource={listBrands}
+            pagination={{
+              pageSizeOptions: ["50", "100"],
+              showSizeChanger: true,
+              pageSize: 6,
+            }}
+            rowKey={(record) => record.id}
+          />
+          <div>
+            <Modal
+              className="p-4 mt-20"
+              title={state.isUpdating ? "Cập nhật hãng" : "Thêm hãng"}
+              open={isModalOpen}
+              onOk={handleOk}
+              onCancel={handleCancel}
+              maskClosable={false}
+            >
+              <label className="block text-md mt-6"> Tên hãng </label>
+              <input
+                placeholder="Brand name"
+                className="border-2 border-solid rounded-lg p-2 focus:outline-none w-1/3 text-sm"
+                type="text"
+                value={state.brandName}
+                onChange={(e) =>
+                  setState({ ...state, brandName: e.target.value })
+                }
+              />
+              <div className="flex justify-between items-center align-center w-full">
+                <div className="flex flex-col mt-4 w-full">
+                  <label className="block"> Kinh doanh </label>
+
+                  <Select
+                    mode="multiple"
+                    labelInValue
+                    value={value}
+                    placeholder="Select users"
+                    filterOption={false}
+                    onChange={handleChange}
+                    style={{ width: "100%" }}
+                  >
+                    {options.map((d) => (
+                      <Option key={d.value}>{d.text}</Option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            </Modal>
+          </div>
+        </div>
+      )}
+    </Fragment>
+  );
+}
+
+Brands.getLayout = (page) => <AdminLayout>{page}</AdminLayout>;
+
+export default Brands;
