@@ -2,7 +2,7 @@ import Head from "next/head";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-export default function Layout({children }) {
+export default function Layout({ children }) {
   return (
     <div className="w-screen h-screen drop-shadow-lg">
       <Header />
@@ -13,4 +13,3 @@ export default function Layout({children }) {
     </div>
   );
 }
-

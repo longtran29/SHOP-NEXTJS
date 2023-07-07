@@ -7,15 +7,14 @@ import { useContext, useEffect } from "react";
 export default function Auth() {
   const { user } = useContext(AuthContext);
 
-  console.log("Value user in Auth  " +JSON.stringify(user));
+  console.log("Value user in Auth  " + JSON.stringify(user));
   const router = useRouter();
 
   if (user) {
-    if(user === 'ADMIN') {
-      router.push('/admin/dashboard')
-    }
-    else {
-      router.push('/')
+    if (user === "ADMIN") {
+      router.push("/admin/dashboard");
+    } else {
+      router.push("/");
     }
     return null;
   }

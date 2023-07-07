@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -26,6 +27,7 @@ export function AuthProvider({ children }) {
   // login user
   const login = async ({ username, password }) => {
     setError(null); // reset the error state for setting state later
+    setIsLoading(true);
     const response = await fetch(`${NEXT_API}/api/login`, {
       method: "POST",
       headers: {
@@ -45,6 +47,7 @@ export function AuthProvider({ children }) {
     } else {
       setError(data.message); // như phía trên đã setError(null) trước - bởi vì data.message value không đổi nên state này không được update và địa chỉ ô nhớ cũng k được update, do đó bên auth-form sẽ không cập nhật sự thay đổi -> useEffect của auth-form không được thực thi
     }
+    setIsLoading(false);
   };
 
   // logout
@@ -62,7 +65,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, error, login, logout }}>
+    <AuthContext.Provider value={{ user, error, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

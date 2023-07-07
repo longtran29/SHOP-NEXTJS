@@ -21,7 +21,7 @@ function Categories(props) {
     isLoading: false,
     isUpdating: false,
     status: false,
-    updateCateId: null
+    categoryId: null,
   });
 
   const { listCates, updateCategories } = useContext(DataContext);
@@ -30,6 +30,7 @@ function Categories(props) {
 
   const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
 
+  // upload image handler
   const changeImage = (e) => {
     const reader = new FileReader();
     if (e.target.files[0]) {
@@ -42,6 +43,7 @@ function Categories(props) {
     }
   };
 
+  // update category
   const updateCategory = (categoryId) => {
     const updateCate = listCates.find((cate) => cate.id == categoryId);
     setIsModalOpen(true);
@@ -51,12 +53,13 @@ function Categories(props) {
       imagePreview: updateCate.imageUrl,
       isUpdating: true,
       status: updateCate.enabled,
-      updateCateId: categoryId
+      categoryId: categoryId,
     });
   };
 
+  // update status
   const updateStatus = async (categoryId, status) => {
-    await fetch(`${NEXT_API}/api/categories/${categoryId}`, {
+    const resPut = await fetch(`${NEXT_API}/api/categories/${categoryId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -64,14 +67,18 @@ function Categories(props) {
       body: JSON.stringify({
         status: status,
       }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Value update " + JSON.stringify(data));
-        updateCategories(data.categories);
-      });
+    });
+
+    const data = await resPut.json();
+
+    if (!resPut.ok) {
+      toast.error(data.message);
+    } else {
+      updateCategories(data.categories);
+    }
   };
 
+  // handle delete
   const deleteCategory = (categoryId) => {
     confirm({
       title: "Are you sure delete this category?",
@@ -81,14 +88,21 @@ function Categories(props) {
       cancelText: "No",
       onOk() {
         const deleteCate = async () => {
-          await fetch(`${NEXT_API}/api/categories/${categoryId}`, {
-            method: "DELETE",
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              updateCategories(data.categories);
-            })
-            .catch((err) => toast.error(err));
+          const resDel = await fetch(
+            `${NEXT_API}/api/categories/${categoryId}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          const delData = await resDel.json();
+
+          if (!resDel.ok) {
+            toast.error(delData.message);
+          } else {
+            updateCategories(delData.categories);
+            toast.success("Xoá thành công");
+          }
         };
 
         deleteCate();
@@ -98,15 +112,16 @@ function Categories(props) {
       },
     });
   };
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
+
+  // handle submut
   const handleOk = async () => {
+    if (state.categoryName === "") {
+      toast.error("Vui lòng nhập tên danh mục");
+      return;
+    }
     if (!state.isUpdating) {
-      if (state.categoryName === "") {
-        toast.error("Vui lòng nhập tên danh mục");
-        return;
-      } else if (state.imageData == null) {
+      // dang them
+      if (state.imageData == null) {
         toast.error("Vui lòng chọn ảnh mẫu");
         return;
       }
@@ -114,18 +129,21 @@ function Categories(props) {
       formData.append("file", state.imageData);
       let tempImageUrl = "";
       setState({ ...state, isLoading: true });
-
-      await fetch(`${API_URL}/upload/image`, {
+      const resPos1 = await fetch(`${API_URL}/upload/image`, {
         method: "POST",
         body: formData,
-      })
-        .then((res) => res.text())
-        .then((imgUrl) => {
-          tempImageUrl = imgUrl;
-          setState({ ...state, imageUrl: imgUrl });
-        });
+      });
 
-      await fetch(`${NEXT_API}/api/categories`, {
+      const postData1 = await resPos1.text();
+      console.log("Value is " + postData1);
+      if (!resPos1.ok) {
+        toast.error("Lỗi upload ảnh");
+      } else {
+        tempImageUrl = postData1;
+        setState({ ...state, imageUrl: tempImageUrl });
+      }
+
+      const resPos2 = await fetch(`${NEXT_API}/api/categories`, {
         method: "POST",
         headers: {
           // this request carries JSON
@@ -136,24 +154,20 @@ function Categories(props) {
           enabled: true,
           imageUrl: tempImageUrl,
         }),
-      })
-        .then((res) => {
-          if (!res.ok) throw res;
-          else return res.json(); // extract the json part
-        })
-        .then((data) => {
-          updateCategories(data.categories);
-        })
-        .catch((err) => {
-          err.json().then((errJson) => {
-            toast.error(errJson.message);
-          });
-        });
-    } else {
-      if (state.categoryName === "") {
-        toast.error("Vui lòng nhập tên danh mục");
-        return;
+      });
+
+
+      const resData = await resPos2.json();
+
+
+      if (!resPos2.ok) {
+        toast.error(resData.message);
+        
+      } else {
+        updateCategories(resData.categories);
       }
+    } else {
+      // cap nhat danh muc
 
       let tempImageUrl = "";
       setState({ ...state, isLoading: true });
@@ -161,18 +175,22 @@ function Categories(props) {
       if (state.imageData) {
         const formData = new FormData();
         formData.append("file", state.imageData);
-        await fetch(`${API_URL}/upload/image`, {
+        const resPos2 = await fetch(`${API_URL}/upload/image`, {
           method: "POST",
           body: formData,
-        })
-          .then((res) => res.text())
-          .then((imgUrl) => {
-            tempImageUrl = imgUrl;
-            setState({ ...state, imageUrl: imgUrl });
-          });
+        });
+        const resPostData2 = await resPos2.text(); // use text() instead of .json() - return image url not object
+        if (!resPos2.ok) {
+          toast.error("Lỗi upload ảnh ");
+        } else {
+          tempImageUrl = resPostData2;
+          setState((prevState) => ({ ...prevState, imageUrl: tempImageUrl }));
+        }
       }
 
-      await fetch(`${NEXT_API}/api/categories/${state.updateCateId}`, {
+      const categoryId = state.categoryId;
+
+      const resPut = await fetch(`${NEXT_API}/api/categories/${categoryId}`, {
         method: "PUT",
         headers: {
           // this request carries JSON
@@ -183,19 +201,15 @@ function Categories(props) {
           imageUrl: tempImageUrl,
           enabled: state.status,
         }),
-      })
-        .then((res) => {
-          if (!res.ok) throw res;
-          else return res.json(); // extract the json part
-        })
-        .then((data) => {
-          updateCategories(data.categories);
-        })
-        .catch((err) => {
-          err.json().then((errJson) => {
-            toast.error(errJson.message);
-          });
-        });
+      });
+
+      const resPutData = await resPut.json();
+
+      if (!resPut.ok) {
+        toast.error(resPutData.message);
+      } else {
+        updateCategories(resPutData.categories);
+      }
     }
 
     setIsModalOpen(false);
@@ -210,13 +224,14 @@ function Categories(props) {
     });
   };
 
+  // handle cancel
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
   const columns = [
     {
-      title: "STT",
+      title: "ID",
       dataIndex: "id",
       key: "id",
       sortOrder: "ascend",
@@ -258,8 +273,10 @@ function Categories(props) {
       responsive: ["sm"],
       render: (_, record) => (
         <div className="flex items-center">
-         
-          <RxUpdate onClick={() => updateCategory(record.id)} className="hover:cursor-pointer hover:text-primary-700"/>
+          <RxUpdate
+            onClick={() => updateCategory(record.id)}
+            className="hover:cursor-pointer hover:text-primary-700"
+          />
 
           <MdDeleteOutline
             className="text-red-400 hover:fill-primary-700 text-xl ml-6 hover:cursor-pointer"
@@ -282,7 +299,7 @@ function Categories(props) {
           <div className="mb-4">
             <button
               className="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
-              onClick={showModal}
+              onClick={() => setIsModalOpen(true)}
             >
               <svg
                 className="-ml-1 mr-2 h-6 w-6"
@@ -304,11 +321,10 @@ function Categories(props) {
             }}
             rowKey={(record) => record.id}
           />
-          ;{/* open modal add category */}
           <div>
             <Modal
               className="p-4 mt-20"
-              title= {state.isUpdating? "Cập nhật danh mục" : "Thêm danh mục"}
+              title={state.isUpdating ? "Cập nhật danh mục" : "Thêm danh mục"}
               open={isModalOpen}
               onOk={handleOk}
               onCancel={handleCancel}
