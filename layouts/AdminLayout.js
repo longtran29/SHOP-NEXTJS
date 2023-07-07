@@ -1,19 +1,96 @@
-import NavAdmin from "@/components/Navbar/NavAdmin";
-import Sidebar from "@/components/Sidebar/Sidebar";
-import React, { Children } from "react";
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Button, Layout, Menu, theme } from "antd";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { FaUserTag } from "react-icons/fa";
+import { HiTemplate } from "react-icons/hi";
+import { BiSolidCategory, BiSolidReport } from "react-icons/bi";
+import { TbBrandEnvato } from "react-icons/tb";
+import { BsFillPostcardHeartFill } from "react-icons/bs";
+import { AiFillDashboard } from "react-icons/ai";
 
-function AdminLayout({ children }) {
+const { Header, Sider, Content } = Layout;
+const AdminLayout = ({ children }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
+  const router = useRouter();
+
+  function getItem(label, key, icon, pathroute) {
+    return {
+      key,
+      icon,
+      pathroute,
+      label,
+    };
+  }
+
+  const items = [
+    getItem("Dashboard", "1", <AiFillDashboard />, "/admin/dashboard"),
+    getItem("Products", "2", <HiTemplate />, "/admin/products"),
+    getItem("User", "3", <FaUserTag />, "/admin/users"),
+    getItem("Category", "4", <BiSolidCategory />, "/admin/categories"),
+    getItem("Brands", "5", <TbBrandEnvato />, "/admin/brands"),
+    getItem("Blogs", "6", <BsFillPostcardHeartFill />, "/admin/blogs"),
+    getItem("Thống kê", "7", <BiSolidReport />, "/admin/report"),
+  ];
+
+  const handleClick = ({ item, key }) => {
+    console.log("Value click " + " " + key + " " + item.props.pathroute);
+    router.push(item.props.pathroute);
+  };
   return (
-    <div className="h-screen">
-      <NavAdmin />
-
-      <div className="flex flex-row h-screen">
-        <Sidebar />
-
-        <div className="flex-1 w-full">{children}</div>
-      </div>
-    </div>
+    <Layout
+      style={{
+        minHeight: "100vh",
+      }}
+    >
+      <Sider trigger={null} collapsible collapsed={collapsed}>
+        <div className="demo-logo-vertical" />
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={["1"]}
+          items={items}
+          onClick={handleClick}
+        />
+      </Sider>
+      <Layout>
+        <Header
+          style={{
+            padding: 0,
+            background: colorBgContainer,
+          }}
+        >
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              fontSize: "16px",
+              width: 64,
+              height: 64,
+            }}
+          />
+        </Header>
+        <Content
+          style={{
+            margin: "24px 16px",
+            padding: 24,
+            minHeight: 280,
+            background: colorBgContainer,
+          }}
+        >
+          {children}
+        </Content>
+      </Layout>
+    </Layout>
   );
-}
-
+};
 export default AdminLayout;
