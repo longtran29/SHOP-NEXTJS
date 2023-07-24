@@ -4,7 +4,7 @@ import { API_URL } from '@/config';
 
 export default async (req, res) => {
 
-  console.log("Da vao api user");
+  
   if (req.method === "GET") {
     if (!req.headers.cookie) {
       res.status(403).json({ message: "Not authenticated ! " });
@@ -22,7 +22,7 @@ export default async (req, res) => {
 
     const user = await response.json();
 
-    console.log("Value user info " + JSON.stringify(user));
+    
 
     res.status(200).json({user: user});
   } else {

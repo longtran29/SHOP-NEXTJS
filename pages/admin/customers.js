@@ -16,7 +16,7 @@ function Customers(props) {
       setIsModalOpen(false);
     };
 
-    console.log("Da vao user");
+    
     return (
         <div>
        

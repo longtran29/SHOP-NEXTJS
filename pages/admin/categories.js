@@ -10,6 +10,8 @@ import { MdDeleteOutline } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { toast } from "react-toastify";
+import SpinTip from "@/components/loading/SpinTip";
+import { handleImageUpload } from "@/utils/uploadImage";
 
 function Categories(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,11 +26,14 @@ function Categories(props) {
     categoryId: null,
   });
 
-  const { listCates, updateCategories } = useContext(DataContext);
+  const { listCates, updateCategories, getCategories, isLoading } =
+    useContext(DataContext);
 
   const { confirm } = Modal;
 
   const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
+
+  let imgUrl = "";
 
   // upload image handler
   const changeImage = (e) => {
@@ -100,48 +105,39 @@ function Categories(props) {
           if (!resDel.ok) {
             toast.error(delData.message);
           } else {
-            updateCategories(delData.categories);
+            getCategories();
             toast.success("Xoá thành công");
           }
         };
 
         deleteCate();
       },
-      onCancel() {
-        console.log("Cancel");
-      },
+      onCancel() {},
     });
   };
 
-  // handle submut
+  // handle submit
   const handleOk = async () => {
     if (state.categoryName === "") {
       toast.error("Vui lòng nhập tên danh mục");
       return;
     }
+
+    // dang them
     if (!state.isUpdating) {
-      // dang them
       if (state.imageData == null) {
         toast.error("Vui lòng chọn ảnh mẫu");
         return;
       }
-      const formData = new FormData();
-      formData.append("file", state.imageData);
-      let tempImageUrl = "";
-      setState({ ...state, isLoading: true });
-      const resPos1 = await fetch(`${API_URL}/upload/image`, {
-        method: "POST",
-        body: formData,
-      });
 
-      const postData1 = await resPos1.text();
-      console.log("Value is " + postData1);
-      if (!resPos1.ok) {
-        toast.error("Lỗi upload ảnh");
-      } else {
-        tempImageUrl = postData1;
-        setState({ ...state, imageUrl: tempImageUrl });
-      }
+      await handleImageUpload(state.imageData)
+        .then((res) => {
+          imgUrl = res;
+        })
+        .catch((error) => {
+          toast.error(error);
+          return;
+        });
 
       const resPos2 = await fetch(`${NEXT_API}/api/categories`, {
         method: "POST",
@@ -152,43 +148,34 @@ function Categories(props) {
         body: JSON.stringify({
           name: state.categoryName,
           enabled: true,
-          imageUrl: tempImageUrl,
+          imageUrl: imgUrl,
         }),
       });
 
-
       const resData = await resPos2.json();
-
 
       if (!resPos2.ok) {
         toast.error(resData.message);
-        
-      } else {
-        updateCategories(resData.categories);
+        return;
       }
     } else {
       // cap nhat danh muc
-
-      let tempImageUrl = "";
-      setState({ ...state, isLoading: true });
-
-      if (state.imageData) {
-        const formData = new FormData();
-        formData.append("file", state.imageData);
-        const resPos2 = await fetch(`${API_URL}/upload/image`, {
-          method: "POST",
-          body: formData,
-        });
-        const resPostData2 = await resPos2.text(); // use text() instead of .json() - return image url not object
-        if (!resPos2.ok) {
-          toast.error("Lỗi upload ảnh ");
-        } else {
-          tempImageUrl = resPostData2;
-          setState((prevState) => ({ ...prevState, imageUrl: tempImageUrl }));
-        }
-      }
-
       const categoryId = state.categoryId;
+
+      if (state.imageData != null) {
+        await handleImageUpload(state.imageData)
+          .then((res) => {
+            imgUrl = res;
+          })
+          .catch((error) => {
+            toast.error(error);
+            return;
+          });
+      } else {
+        imgUrl = listCates.find(
+          (category) => category.id == state.categoryId
+        ).imageUrl;
+      }
 
       const resPut = await fetch(`${NEXT_API}/api/categories/${categoryId}`, {
         method: "PUT",
@@ -198,7 +185,7 @@ function Categories(props) {
         },
         body: JSON.stringify({
           name: state.categoryName,
-          imageUrl: tempImageUrl,
+          imageUrl: imgUrl,
           enabled: state.status,
         }),
       });
@@ -207,11 +194,11 @@ function Categories(props) {
 
       if (!resPut.ok) {
         toast.error(resPutData.message);
-      } else {
-        updateCategories(resPutData.categories);
+        return;
       }
     }
-
+    
+    getCategories();
     setIsModalOpen(false);
     setState({
       categoryName: "",
@@ -222,11 +209,21 @@ function Categories(props) {
       isUpdating: false,
       status: false,
     });
+    imgUrl = "";
   };
 
   // handle cancel
   const handleCancel = () => {
     setIsModalOpen(false);
+    setState({
+      categoryName: "",
+      imageUrl: "",
+      imageData: null,
+      imagePreview: null,
+      isLoading: false,
+      isUpdating: false,
+      status: false,
+    });
   };
 
   const columns = [
@@ -289,11 +286,8 @@ function Categories(props) {
 
   return (
     <>
-      {state.isLoading ? (
-        <Spin
-          indicator={antIcon}
-          className="flex justify-center align-center items-center w-screen h-screen"
-        />
+      {isLoading ? (
+        <SpinTip />
       ) : (
         <div className="p-10">
           <div className="mb-4">

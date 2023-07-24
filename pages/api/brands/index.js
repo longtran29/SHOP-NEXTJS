@@ -16,7 +16,7 @@ async function brands(req, res) {
 
       const restData = await rest.json();
       if (!rest.ok) {
-        console.log("Loi " + JSON.stringify(restData));
+        
       } else {
         res.status(200).json({ brands: restData });
       }
