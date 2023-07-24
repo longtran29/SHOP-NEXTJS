@@ -18,7 +18,7 @@ async function categories(req, res) {
 
       const restData = await response.json();
       if (!response.ok) {
-        console.log("Loi " + JSON.stringify(restData));
+        
       } else {
         res.status(200).json({ categories: restData });
       }
@@ -37,10 +37,13 @@ async function categories(req, res) {
 
       const postData = await resPos.json();
 
-      if (!res.ok) {
-        res.status(200).json({ categories: postData });
+      console.log("Value post is " + JSON.stringify(postData));
+
+      if (!resPos.ok) {
+        res.status(500).json({ message: postData.message });
+        
       } else {
-        return res.status(500).json({ message: postData.message });
+        res.status(200).json({ categories: postData });
       }
       break;
 

@@ -7,13 +7,10 @@ export function DataProvider({ children }) {
   const [state, setState] = useState({
     listCates: [],
     listBrands: [],
-    listProds: []
+    listProds: [],
+    isLoading: false,
   });
   const [error, setError] = useState("");
-
-  console.log("Value in context cate " + JSON.stringify(state.listCates));
-  console.log("Value in context brand " + JSON.stringify(state.listBrands));
-  console.log("Value in context prods " + JSON.stringify(state.listProds));
 
   useEffect(() => {
     getBrands();
@@ -23,14 +20,12 @@ export function DataProvider({ children }) {
     getCategories();
   }, []);
 
-  useEffect(()=> {
+  useEffect(() => {
     getProducts();
-  }, []
-  )
+  }, []);
 
-
-  const getProducts = async() => {
-    console.log("context products");
+  const getProducts = async () => {
+    setState((prevState) => ({ ...prevState, isLoading: true }));
     const response = await fetch(`${NEXT_API}/api/products`, {
       method: "GET",
     });
@@ -38,18 +33,15 @@ export function DataProvider({ children }) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.log("Looi " + JSON.stringify(data));
       setError(data.message);
     } else {
-      console.log("ds prods context " + JSON.stringify(data));
-      updateProducts(data.products);    // default return object json with categories prop
+      updateProducts(data.products); // default return object json with categories prop
     }
-  
-   
+    setState((prevState) => ({ ...prevState, isLoading: false }));
   };
 
   const getBrands = async () => {
-    console.log("context brand");
+    setState((prevState) => ({ ...prevState, isLoading: true }));
     const response = await fetch(`${NEXT_API}/api/brands`, {
       method: "GET",
     });
@@ -57,12 +49,11 @@ export function DataProvider({ children }) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.log("Looi " + JSON.stringify(data));
       setError(data.message);
     } else {
       updateBrands(data.brands);
     }
-  
+    setState((prevState) => ({ ...prevState, isLoading: false }));
   };
 
   const updateBrands = (updatedBrands) => {
@@ -74,10 +65,11 @@ export function DataProvider({ children }) {
   };
 
   const updateProducts = (updatedProds) => {
-    setState((prevState) => ({...prevState, listProds: updatedProds}))   
-  }
+    setState((prevState) => ({ ...prevState, listProds: updatedProds }));
+  };
 
   const getCategories = async () => {
+    setState((prevState) => ({ ...prevState, isLoading: true }));
     const response = await fetch(`${NEXT_API}/api/categories`, {
       method: "GET",
     });
@@ -89,6 +81,7 @@ export function DataProvider({ children }) {
     } else {
       updateCategories(data.categories);
     }
+    setState((prevState) => ({ ...prevState, isLoading: false }));
   };
 
   const value = {
@@ -98,7 +91,10 @@ export function DataProvider({ children }) {
     updateBrands,
     error: error,
     listProds: state.listProds,
-    updateProducts
+    updateProducts,
+    isLoading : state.isLoading,
+    getCategories,
+    getBrands
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

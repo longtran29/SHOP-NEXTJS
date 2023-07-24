@@ -22,7 +22,8 @@ function Brands(props) {
 
   const { value } = state;
 
-  const { listBrands, listCates, updateBrands } = useContext(DataContext);
+  const { listBrands, listCates, updateBrands, getBrands } =
+    useContext(DataContext);
 
   const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
 
@@ -67,16 +68,14 @@ function Brands(props) {
           if (!response.ok) {
             toast.error(data.message);
           } else {
-            updateBrands(data.brands);
+            updateBrands(data.message);
             toast.success("Xoá thành công !");
           }
         };
 
         deleteBrand();
       },
-      onCancel() {
-        console.log("Cancel");
-      },
+      onCancel() {},
     });
   }
 
@@ -108,9 +107,10 @@ function Brands(props) {
 
       if (!response.ok) {
         toast.error(data.message);
+        return;
       } else {
-        updateBrands(data.brands);
-        toast.success("Đã thêm thành công !");
+        getBrands();
+        toast.success("Đã thêm !");
       }
     } else {
       // dang cap nhat
@@ -129,8 +129,9 @@ function Brands(props) {
 
       if (!response.ok) {
         toast.error(data.message);
+        return;
       } else {
-        updateBrands(data.brands);
+        getBrands();
         toast.success("Cập nhật thành công !");
       }
     }

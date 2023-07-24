@@ -20,7 +20,7 @@ async function brand(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.log("message is " + JSON.stringify(data));
+      
       res.status(500).json({ message: data.message });
     } else {
       res.status(200).json({ brands: data });
@@ -33,11 +33,11 @@ async function brand(req, res) {
         Authorization: `Bearer ${token}`
       },
     });
-    const data = await response.json();
+    const data = response.text();
     if (!response.ok) {
       res.status(500).json({ message: data.message });
     } else {
-      res.status(200).json({ brands: data });
+      res.status(200).json({ message: data });
     }
   }
 }

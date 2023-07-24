@@ -1,5 +1,6 @@
 import { NEXT_API } from "@/config";
 import DataContext from "@/context/DataContext";
+import { useFilterContext } from "@/context/FilterContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
 import { Image, Input, Modal, Spin, Switch, Table, Tag } from "antd";
@@ -9,10 +10,10 @@ import { MdDeleteOutline } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
 import { toast } from "react-toastify";
 
-
 function Products(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { listProds, updateProducts } = useContext(DataContext);
+  const { updateProducts } = useContext(DataContext);
+  const { filter_products, updateFilterValue } = useFilterContext();
   const [state, setState] = useState({
     imagePreview: "",
     imageData: null,
@@ -31,12 +32,20 @@ function Products(props) {
     category: null,
     productQuantity: 0,
   });
+  const [searchValue, setSearchValue] = ("")
 
   const { confirm } = Modal;
 
   const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
 
+  const Search = Input.Search;
+
   const router = useRouter();
+
+  const searchValueHandle = (value) => {
+    setSearchValue(value);
+    updateFilterValue("text", value)
+  }
 
   // update product
   const updateProduct = (productId) => {
@@ -65,7 +74,6 @@ function Products(props) {
           if (!resDel.ok) {
             toast.error(delData.message);
           } else {
-            console.log("Product returne " + JSON.stringify(delData.products));
             updateProducts(delData.products);
             toast.success("Xoá thành công");
           }
@@ -73,9 +81,7 @@ function Products(props) {
 
         deleteProduct();
       },
-      onCancel() {
-        console.log("Cancel");
-      },
+      onCancel() {},
     });
   };
 
@@ -180,23 +186,33 @@ function Products(props) {
       ) : (
         <div className="p-10">
           <div className="mb-4">
-            <button
-              className="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
-              onClick={() => router.push("/admin/product")}
-            >
-              <svg
-                className="-ml-1 mr-2 h-6 w-6"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+            <div className="flex justify-between items-center">
+              <Search
+                className="w-1/3 p-2"
+                placeholder="Search product name"
+                onSearch={(value) => updateFilterValue("text", value)}
+                enterButton
+                value={searchValue}
+              />
+
+              <button
+                className="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
+                onClick={() => router.push("/admin/product")}
               >
-                <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path>
-              </svg>
-              Add product
-            </button>
+                <svg
+                  className="-ml-1 mr-2 h-6 w-6"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path>
+                </svg>
+                Add product
+              </button>
+            </div>
           </div>
           <Table
             columns={columns}
-            dataSource={listProds}
+            dataSource={filter_products}
             pagination={{
               pageSizeOptions: ["50", "100"],
               showSizeChanger: true,

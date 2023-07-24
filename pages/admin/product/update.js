@@ -46,10 +46,10 @@ function UpdateProduct(props) {
 
   const updateProdId = router.query.updateId;
 
-  console.log("value update is " + updateProdId);
+  
 
-  // console.log("DS  brand " + JSON.stringify(listBrands));
-  // console.log("DS cate " + JSON.stringify(listCates));
+  // 
+  // 
 
   // handle fetching cates and brands from DataContext - fetch API async
   useEffect(() => {
@@ -65,7 +65,7 @@ function UpdateProduct(props) {
 
 
 
-    console.log("Danh sach la " + listBrands.length + " " + listCates.length); // test dependency change
+    
 
     if (
       listBrands.length > 0 &&
@@ -73,16 +73,16 @@ function UpdateProduct(props) {
       listProds.length > 0 &&
       router.query.updateId != null
     ) {
-      console.log("Value of product update " + JSON.stringify(product));
-      console.log("List product update " + JSON.stringify(listProds));
+      
+      
 
       let existedProduct = listProds.find(
         (prod) => prod.id == router.query.updateId
       ); // based on productId
-      console.log("existed product " + JSON.stringify(existedProduct));
+      
       setProduct(existedProduct);
 
-      console.log("List brand is " + JSON.stringify(listBrands));
+      
 
       let valueBrand = listBrands.find(
         (brand) => brand.id == existedProduct.brand
@@ -93,9 +93,7 @@ function UpdateProduct(props) {
 
       filterCate(existedProduct.brand);
 
-      console.log(
-        "Value cate and brand default " + valueBrand + " " + valueCate
-      );
+    
 
       setState((prevState) => ({
         ...prevState,
@@ -109,7 +107,7 @@ function UpdateProduct(props) {
     }
   }, [listBrands, listCates, listProds, router.query.updateId]); // 2 dependency
 
-  // console.log("Value loading " + state.isLoading);
+  // 
 
   // upload product
   const updateProduct = async () => {
@@ -162,7 +160,7 @@ function UpdateProduct(props) {
 
   // filter category followed by brand
   const filterCate = async (e) => {
-    console.log("Vao 1");
+    
     const response = await fetch(`${API_URL}/brands/categories/${e}`);
 
     const categories = await response.json();
@@ -315,23 +313,10 @@ function UpdateProduct(props) {
               </div>
 
               <div className="flex flex-col">
-                {console.log("value " + defaultCate)}
+              
                 <label className="font-medium italic mt-3">Category </label>
 
-                {/* <select defaultValue={state.defaultCate}
-                  className="mt-2 border-2 border-solid w-1/3 p-1 px-4 py-2 rounded-lg"
-                  onChange={(e) =>
-                    setProduct({ ...product, category: e.target.value })
-                  }
-                >
-                  {state.categoryOptions.map((category) => {
-                    return (
-                      <option key={category.value} value={category.value}>
-                        {category.label}
-                      </option>
-                    );
-                  })}
-                </select> */}
+           
                 <Select
                   defaultValue={state.defaultCate}
                   style={{

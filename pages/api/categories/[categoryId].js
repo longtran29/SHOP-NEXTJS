@@ -14,7 +14,7 @@ async function categories(req, res) {
       },
     });
 
-    const dataDel = await resDel.json();
+    const dataDel = resDel.text();
 
     if (!resDel.ok) {
       res.status(500).json({ message: dataDel.message });

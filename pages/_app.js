@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Head from "next/head";
 import { ToastContainer } from "react-toastify";
 import { DataProvider } from "@/context/DataContext";
+import { FilterProvider } from "@/context/FilterContext";
 
 export default function App(props) {
   const { Component, pageProps, title, keywords, description } = props;
@@ -23,7 +24,11 @@ export default function App(props) {
         />
       </Head>
       <AuthProvider>
-        <DataProvider>{getLayout(<Component {...pageProps} />)}</DataProvider>
+        <DataProvider>
+          <FilterProvider>
+            {getLayout(<Component {...pageProps} />)}
+          </FilterProvider>
+        </DataProvider>
       </AuthProvider>
     </>
   );

@@ -7,7 +7,7 @@ async function handleLogin(req, res) {
     res.status(405).end();
     return;
   }
-  console.log("req body " + JSON.stringify(req.body));
+  
 
   // here we just get the response HTTP. use for check the status (.ok() method)
   const response = await fetch(`${API_URL}/authenticate`, {

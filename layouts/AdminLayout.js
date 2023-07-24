@@ -19,6 +19,7 @@ const AdminLayout = ({ children }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const [current, setCurrent] = useState("1");
 
   const router = useRouter();
 
@@ -42,7 +43,7 @@ const AdminLayout = ({ children }) => {
   ];
 
   const handleClick = ({ item, key }) => {
-    console.log("Value click " + " " + key + " " + item.props.pathroute);
+    setCurrent(key);
     router.push(item.props.pathroute);
   };
   return (
@@ -57,6 +58,7 @@ const AdminLayout = ({ children }) => {
           theme="dark"
           mode="inline"
           defaultSelectedKeys={["1"]}
+          selectedKeys={[current]}
           items={items}
           onClick={handleClick}
         />
