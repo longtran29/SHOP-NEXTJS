@@ -1,14 +1,14 @@
 import AdminLayout from "@/layouts/AdminLayout";
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Input, InputNumber, Spin, Switch } from "antd";
+import { Button, Card, Col, Input, InputNumber, Row, Spin, Switch } from "antd";
 import { Select } from "antd";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import DataContext from "@/context/DataContext";
 import { API_URL, NEXT_API } from "@/config";
 import { toast } from "react-toastify";
-
+import icon_upload from "../../../public/images/logo_upload.png";
 
 const ReactQuill = dynamic(import("react-quill"), {
   ssr: false,
@@ -25,11 +25,15 @@ function AddProduct(props) {
     defaultBrand: "",
     isLoading: true,
     imageData: null,
+    primaryImage: null,
+    primaryImagePrev: "",
   });
+
+  const [extraImage, setExtraImage] = useState([]);
+  // let extraImage = [];
 
   const [product, setProduct] = useState({
     name: "",
-    primaryImage: "",
     enabled: true,
     original_price: 1.0,
     discount_percent: 0.0,
@@ -41,11 +45,12 @@ function AddProduct(props) {
   });
   const { listBrands, listCates, updateProducts, listProds } =
     useContext(DataContext);
+  const [images, setImages] = useState([]);
 
   const { defaultCate } = state;
 
-  // console.log("DS  brand " + JSON.stringify(listBrands));
-  // console.log("DS cate " + JSON.stringify(listCates));
+  //
+  //
 
   // handle fetching cates and brands from DataContext - fetch API async
   useEffect(() => {
@@ -65,8 +70,6 @@ function AddProduct(props) {
 
     // let valueCate = cateOpts.length > 0 ? cateOpts[0].label : "";
 
-    console.log("Danh sach la " + listBrands.length + " " + listCates.length); // test dependency change
-
     if (listBrands.length > 0 && listCates.length > 0) {
       let valueBrand = brandOpts.length > 0 ? brandOpts[0].label : "";
 
@@ -79,37 +82,27 @@ function AddProduct(props) {
     }
   }, [listBrands, listCates]); // 2 dependency
 
-  // console.log("Value loading " + state.isLoading);
+  //
 
   // upload product
   const createProduct = async () => {
-    if (state.imageData == null) {
+    if (state.primaryImage == null) {
       toast.error("Vui lòng chọn ảnh");
       return;
     }
     setState({ ...state, isLoading: true });
+
     const formData = new FormData();
-    formData.append("file", state.imageData);
-    const resPos1 = await fetch(`${API_URL}/upload/image`, {
-      method: "POST",
-      body: formData,
-    });
+    formData.append("product", JSON.stringify(product));
+    formData.append("primaryImage", state.primaryImage);
 
-    const postData1 = await resPos1.text();
-    if (!resPos1.ok) {
-      toast.error("Lỗi upload ảnh");
-    } else {
-      setProduct({ ...product, primaryImage: postData1 }); // setProduct is async
+    for (let i = 0; i < extraImage.length; i++) {
+      formData.append("extraImage", extraImage[i]);
     }
-
-    const payload = { ...product, primaryImage: postData1 }; // temp solution : clone object and create new prop
 
     const resPos = await fetch(`${NEXT_API}/api/products`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+      body: formData,
     });
 
     const posData = await resPos.json();
@@ -127,7 +120,6 @@ function AddProduct(props) {
 
   // filter category followed by brand
   const filterCate = async (e) => {
-    console.log("Vao 1");
     const response = await fetch(`${API_URL}/brands/categories/${e}`);
 
     const categories = await response.json();
@@ -152,15 +144,27 @@ function AddProduct(props) {
 
   // upload image
   const changeImage = (e) => {
-    const reader = new FileReader();
-    if (e.target.files[0]) {
-      reader.readAsDataURL(e.target.files[0]);
-      setState({
-        ...state,
-        imageData: e.target.files[0],
-        imagePreview: URL.createObjectURL(e.target.files[0]),
-      });
+    const files = e.target.files;
+    // extraImage = files;
+    setExtraImage(files);
+
+    for (let i = 0; i < files.length; i++) {
+      setImages((prevImage) => [
+        ...prevImage,
+        {
+          name: files[i].name,
+          url: URL.createObjectURL(files[i]),
+        },
+      ]);
     }
+  };
+
+  const setPrimaryImage = (e) => {
+    setState({
+      ...state,
+      primaryImagePrev: URL.createObjectURL(e.target.files[0]),
+      primaryImage: e.target.files[0],
+    });
   };
 
   return (
@@ -168,14 +172,22 @@ function AddProduct(props) {
       {state.isLoading ? (
         <Spin />
       ) : (
-        <form>
-          <div className="flex flex ">
-            <div className="w-2/3">
-              <div className="flex flex-col w-1/3">
-                <label className="font-medium italic">Tên sản phẩm </label>
+        <>
+          <Row className="">
+            <Col flex="400px" className="pl-4">
+              <div className="info-1">
+                <h2 className="font-medium  text-base">About</h2>
+                <p className="text-gray-700">Basic product information</p>
+              </div>
+            </Col>
+            <Col flex="1">
+              <div className="flex flex-col">
+                <label className="font-semibold text-base">
+                  Tên sản phẩm *
+                </label>
                 <input
                   type="text"
-                  className="p-1 border-2 border-solid focus:outline-none rounded-xl  justify-center mt-2"
+                  className="p-1.5 border-2 border-solid required:border-red-500 focus:border-black rounded-md justify-center hover:border-purple-400 mt-2"
                   placeholder="Nhập tên sản phẩm"
                   value={product.name}
                   onChange={(e) =>
@@ -184,21 +196,11 @@ function AddProduct(props) {
                 />
               </div>
 
-              <div className="flex flex-col mt-4">
-                <label className="font-medium italic"> Enabled </label>
-                <Switch
-                  className="w-4"
-                  // defaultChecked
-                  checked={product.enabled}
-                  onClick={() =>
-                    setProduct({ ...product, enabled: !product.enabled })
-                  }
-                />
-              </div>
-
-              <div className="flex mt-6 mb-2">
+              <div className="flex flex mt-2">
                 <div className="flex flex-col ">
-                  <label className="font-medium italic mt-3">Discount</label>
+                  <label className="font-semibold text-base mt-3">
+                    Discount
+                  </label>
                   <InputNumber
                     style={{
                       width: 200,
@@ -214,8 +216,9 @@ function AddProduct(props) {
                     stringMode
                   />
                 </div>
-                <div className="flex flex-col ml-3">
-                  <label className="font-medium italic mt-3">Price </label>
+
+                <div className="flex flex-col ml-8 text-base">
+                  <label className="font-medium mt-3">Price </label>
                   <InputNumber
                     style={{
                       width: 200,
@@ -233,9 +236,9 @@ function AddProduct(props) {
                 </div>
               </div>
 
-              <div className="flex align-center items-center">
+              <div className="flex align-center items-cente mt-2 text-base">
                 <div className="flex flex-col">
-                  <label className="font-medium italic mt-3">Quantity </label>
+                  <label className="font-medium mt-3">Quantity </label>
                   <InputNumber
                     style={{
                       width: 200,
@@ -253,7 +256,7 @@ function AddProduct(props) {
                 </div>
 
                 <div className="flex flex-col mt-6 ml-8">
-                  <label className="font-medium italic"> In Stock </label>
+                  <label className="font-medium"> In Stock </label>
                   <Switch
                     className="w-4"
                     defaultChecked
@@ -263,88 +266,175 @@ function AddProduct(props) {
                     }
                   />
                 </div>
+
+                <div className="flex flex-col mt-6 ml-20">
+                  <label className="font-semibold"> Enabled </label>
+                  <Switch
+                    className="w-4"
+                    // defaultChecked
+                    checked={product.enabled}
+                    onClick={() =>
+                      setProduct({ ...product, enabled: !product.enabled })
+                    }
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col">
-                <label className="font-medium italic mt-3">Brand </label>
-                <Select
-                  defaultValue={state.defaultBrand}
-                  style={{
-                    width: 120,
-                  }}
-                  onChange={filterCate}
-                  options={state.brandOptions}
-                />
+              <div className="flex flex-col mt-6">
+                <label className="font-semibold"> Primary Image </label>
+                <div className="flex align-center items-center mt-2">
+                  <Image
+                    src={icon_upload}
+                    width={50}
+                    height={50}
+                    className="rounded-full"
+                  />
+
+                  <Input
+                    className="w-1/3 ml-8"
+                    tabIndex={"-1"}
+                    type="file"
+                    accept="image/png,image/jpg,image/jpeg"
+                    multiple
+                    encType="multipart/form-data"
+                    autoComplete="off"
+                    // style={{ display: "none" }}
+                    required={true}
+                    onChange={(e) => setPrimaryImage(e)}
+                  />
+                </div>
+              </div>
+            </Col>
+          </Row>
+
+          {state.primaryImagePrev && (
+            <Row className="mt-4">
+              <div className="">
+                <Card style={{ width: 300, height: 300 }}>
+                  <img src={state.primaryImagePrev} />
+                </Card>
+              </div>
+            </Row>
+          )}
+          <hr className="border-1 border-gray-200 mt-10" />
+
+          <Row className="mt-10">
+            <Col flex="400px" className="pl-4">
+              <div className="info-1">
+                <h2 className="font-medium  text-base">Brand & category</h2>
+                <p className="text-gray-700">In brand and category</p>
+              </div>
+            </Col>
+            <Col flex="1">
+              <div className="flex flex-col mt-2 text-base">
+                <div className="flex flex-col">
+                  <label className="font-semibold  mt-3 mb-2">Brand </label>
+                  <Select
+                    defaultValue={state.defaultBrand}
+                    style={
+                      {
+                        // width: 120,
+                      }
+                    }
+                    onChange={filterCate}
+                    options={state.brandOptions}
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="font-semibold  mt-3">Category </label>
+
+                  <select
+                    className="mt-2 border-2 border-solid p-1 px-4 py-2 rounded-lg hover:border-purple-100"
+                    onChange={(e) =>
+                      setProduct({ ...product, category: e.target.value })
+                    }
+                  >
+                    {state.categoryOptions.map((category) => {
+                      return (
+                        <option key={category.value} value={category.value}>
+                          {category.label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
 
-              <div className="flex flex-col">
-                {console.log("value " + defaultCate)}
-                <label className="font-medium italic mt-3">Category </label>
-
-                <select
-                  className="mt-2 border-2 border-solid w-1/3 p-1 px-4 py-2 rounded-lg"
-                  onChange={(e) =>
-                    setProduct({ ...product, category: e.target.value })
-                  }
-                >
-                  {state.categoryOptions.map((category) => {
-                    return (
-                      <option key={category.value} value={category.value}>
-                        {category.label}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-
-              <div className="mt-6">
-                <label className="font-medium italic mb-6"> Description</label>
+              <div className="mt-6 ">
+                <label className="font-semibold text-base mb-10">
+                  {" "}
+                  Description
+                </label>
                 <div>
                   <ReactQuill
                     theme="snow"
                     value={product.description}
                     onChange={(e) => setProduct({ ...product, description: e })}
+                    style={{
+                      height: 200,
+                    }}
                   />
                 </div>
               </div>
+            </Col>
+          </Row>
 
-              <div className="flex justify-center">
-                <button
-                  className="bg-primary-700 hover:bg-primary-900 text-white p-4 rounded-md px-6 py-2.5 mt-6 self-center"
-                  onClick={() => createProduct()}
-                >
-                  Submit
-                </button>
+          <hr className="border-1 border-gray-200 mt-20" />
+
+          <Row className="mt-10">
+            <Col flex="400px" className="pl-4">
+              <div className="info-1">
+                <h2 className="font-medium  text-base">Extra image</h2>
+                <p className="text-gray-700">Product Image</p>
               </div>
-            </div>
+            </Col>
+            <Col flex="1">
+              <div className="flex align-center items-center mt-2">
+                <Image
+                  src={icon_upload}
+                  width={100}
+                  height={100}
+                  className="rounded-full"
+                />
 
-            <div className="flex flex-col">
-              <div>
-                <label>Upload image</label>
                 <Input
+                  className="w-1/3 ml-8"
+                  tabIndex={"-1"}
                   type="file"
-                  accept="image/*"
+                  accept="image/png,image/jpg,image/jpeg"
+                  encType="multipart/form-data"
+                  multiple
+                  autoComplete="off"
+                  // style={{ display: "none" }}
                   required={true}
                   onChange={(e) => changeImage(e)}
                 />
               </div>
+            </Col>
+          </Row>
 
-              <div>
-                {state.imagePreview && (
-                  <div className="mt-20">
-                    <Image
-                      width={200}
-                      height={200}
-                      id="imagePreview"
-                      src={state.imagePreview}
-                      alt="image_preview"
-                    />
-                  </div>
-                )}
-              </div>
+          <Row className="mt-4">
+            <div className="grid gap-4 grid-cols-3 place-items-center">
+              {images.map((image) => (
+                <div key={image.name}>
+                  <Card style={{ width: 300, height: 300 }}>
+                    <img src={image.url} />
+                  </Card>
+                </div>
+              ))}
             </div>
+          </Row>
+
+          <div className="flex justify-center">
+            <button
+              className="bg-black text-white hover:bg-primary-700 font-semibold rounded-md px-4 py-2 mt-6 border border-1 border-solid rounded-md self-center"
+              onClick={() => createProduct()}
+            >
+              Submit
+            </button>
           </div>
-        </form>
+        </>
       )}
     </div>
   );
