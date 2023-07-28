@@ -1,10 +1,9 @@
 import AuthContext from "@/context/AuthContext";
 import Link from "next/link";
-import { useContext } from "react";
-import { FaSignInAlt } from "react-icons/fa";
-import { BsCart } from "react-icons/bs";
-import { GoSignIn } from "react-icons/go";
-import { BiUser } from "react-icons/bi";
+import React, { useContext } from "react";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Avatar from "@mui/material/Avatar";
 import logo from "../public/images/uniqlo_logo.png";
 import Image from "next/image";
 
@@ -18,6 +17,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
+import { Divider, ListItemIcon, Menu, MenuItem } from "@mui/material";
+import { Logout, PersonAdd } from "@mui/icons-material";
+import CartContext from "@/context/CartContext";
 
 const navigation = {
   categories: [
@@ -158,12 +160,18 @@ export default function Header() {
 
   const [profileOpen, setProfileOpen] = useState(false);
 
-  console.log("User is " + JSON.stringify(user));
-  const [open, setOpen] = useState(false);
+  const {cart} = useContext(CartContext);
+
   const router = useRouter();
 
-  const profile = () => {
-    router.push("/account/profile");
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openProfile = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   function DropdownItem(props) {
@@ -530,10 +538,18 @@ export default function Header() {
                   )}
 
                   {user && (
-                    <BiUser
-                      className="text-xl hover:cursor-pointer"
-                      onClickCapture={() => setProfileOpen(!profileOpen)}
-                    />
+                    <Tooltip title="Account settings">
+                      <IconButton
+                        onClick={handleClick}
+                        size="small"
+                        sx={{ ml: 2 }}
+                        aria-controls={open ? "account-menu" : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                      >
+                        <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                      </IconButton>
+                    </Tooltip>
                   )}
                 </div>
 
@@ -564,14 +580,15 @@ export default function Header() {
                 </div>
 
                 {/* Cart */}
-                <div className="ml-4 flow-root lg:ml-6">
+                <div className="ml-4 flow-root lg:ml-6" onClick={() => router.push("/cart")}>
                   <a href="#" className="group -m-2 flex items-center p-2">
                     <ShoppingBagIcon
                       className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                       aria-hidden="true"
+                      
                     />
                     <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                      0
+                     {cart.length}
                     </span>
                     <span className="sr-only">items in cart, view bag</span>
                   </a>
@@ -580,27 +597,56 @@ export default function Header() {
             </div>
           </div>
         </nav>
-
-        <div
-          className={`dropdown-menu  ${profileOpen ? "active" : "inactive"}`}
+        <Menu
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={openProfile}
+          onClose={handleClose}
+          onClick={handleClose}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              overflow: "visible",
+              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              mt: 1.5,
+              "& .MuiAvatar-root": {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+              "&:before": {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: "background.paper",
+                transform: "translateY(-50%) rotate(45deg)",
+                zIndex: 0,
+              },
+            },
+          }}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <h3>
-            {user && user.username}
-            <br />
-          </h3>
-          <ul>
-            <DropdownItem
-              img={<SettingOutlined />}
-              text={"My Profile"}
-              handler={profile}
-            />
-            <DropdownItem
-              img={<LogoutOutlined />}
-              text={"Logout"}
-              handler={logout}
-            />
-          </ul>
-        </div>
+          <MenuItem onClick={handleClose}>
+            <Avatar /> Profile
+          </MenuItem>
+          <MenuItem onClick={handleClose}>
+            <Avatar /> My account
+          </MenuItem>
+          <Divider />
+
+          <MenuItem onClick={logout}>
+            <ListItemIcon>
+              <Logout fontSize="small" />
+            </ListItemIcon>
+            Logout
+          </MenuItem>
+        </Menu>
       </header>
     </div>
   );

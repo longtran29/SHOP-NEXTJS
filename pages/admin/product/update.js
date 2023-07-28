@@ -1,7 +1,7 @@
 import AdminLayout from "@/layouts/AdminLayout";
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Input, InputNumber, Spin, Switch } from "antd";
+import { Card, Col, Input, InputNumber, Row, Spin, Switch } from "antd";
 import { Select } from "antd";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -9,6 +9,8 @@ import DataContext from "@/context/DataContext";
 import { API_URL, NEXT_API } from "@/config";
 import { toast } from "react-toastify";
 import router from "next/router";
+import SpinTip from "@/components/loading/SpinTip";
+import icon_upload from "../../../public/images/logo_upload.png";
 
 const ReactQuill = dynamic(import("react-quill"), {
   ssr: false,
@@ -17,6 +19,11 @@ const ReactQuill = dynamic(import("react-quill"), {
 
 function UpdateProduct(props) {
   const router = useRouter();
+  const updateProdId = router.query.updateId;
+
+  const { listBrands, listCates, getProducts, listProds } =
+    useContext(DataContext);
+
   const [state, setState] = useState({
     imagePreview: null,
     brandOptions: [],
@@ -27,140 +34,31 @@ function UpdateProduct(props) {
     imageData: null,
   });
 
-  const [product, setProduct] = useState({
-    name: "",
-    primaryImage: "",
-    enabled: true,
-    original_price: 1.0,
-    discount_percent: 0.0,
-    description: "",
-    inStock: true,
-    brand: null,
-    category: null,
-    productQuantity: 1,
-  });
-  const { listBrands, listCates, updateProducts, listProds } =
-    useContext(DataContext);
-
   const { defaultCate } = state;
 
-  const updateProdId = router.query.updateId;
+  const [images, setImages] = useState([]);
+  const [extraImage, setExtraImage] = useState([]);
+  const [product, setProduct] = useState(null);
 
-  
+  // up extra images
+  const changeImage = (e) => {
+    const files = e.target.files;
+    // extraImage = files;
+    setExtraImage(files);
 
-  // 
-  // 
-
-  // handle fetching cates and brands from DataContext - fetch API async
-  useEffect(() => {
-    const brandOpts = listBrands.map((brand) => ({
-      value: brand.id,
-      label: brand.name,
-    }));
-
-    const cateOpts = listCates.map((cate) => ({
-      value: cate.id,
-      label: cate.name,
-    }));
-
-
-
-    
-
-    if (
-      listBrands.length > 0 &&
-      listCates.length > 0 &&
-      listProds.length > 0 &&
-      router.query.updateId != null
-    ) {
-      
-      
-
-      let existedProduct = listProds.find(
-        (prod) => prod.id == router.query.updateId
-      ); // based on productId
-      
-      setProduct(existedProduct);
-
-      
-
-      let valueBrand = listBrands.find(
-        (brand) => brand.id == existedProduct.brand
-      ).name;
-      let valueCate = listCates.find(
-        (cate) => cate.id == existedProduct.category
-      ).name;
-
-      filterCate(existedProduct.brand);
-
-    
-
-      setState((prevState) => ({
-        ...prevState,
-        brandOptions: brandOpts,
-        // categoryOptions: cateOpts,
-        defaultBrand: valueBrand,
-        defaultCate: valueCate,
-        imagePreview: existedProduct.primaryImage,
-        isLoading: false,
-      }));
+    for (let i = 0; i < files.length; i++) {
+      setImages((prevImage) => [
+        ...prevImage,
+        {
+          name: files[i].name,
+          url: URL.createObjectURL(files[i]),
+        },
+      ]);
     }
-  }, [listBrands, listCates, listProds, router.query.updateId]); // 2 dependency
-
-  // 
-
-  // upload product
-  const updateProduct = async () => {
-    let tempImageUrl = "";
-    let payload = {};
-
-    setState({ ...state, isLoading: true });
-    if (state.imageData) {
-      const formData = new FormData();
-      formData.append("file", state.imageData);
-      const resPos1 = await fetch(`${API_URL}/upload/image`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const postData1 = await resPos1.text();
-      if (!resPos1.ok) {
-        toast.error("Lỗi upload ảnh");
-      } else {
-        payload = { ...product, primaryImage: postData1 }; // temp solution : clone object and create new prop
-        setProduct({ ...product, primaryImage: postData1 }); // setProduct is async
-      }
-    } else {
-      payload = {...product}
-    }
-
-    
-    
-    const productId = router.query.updateId;
-    const resPos = await fetch(`${NEXT_API}/api/products/${productId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body:JSON.stringify(payload),      
-    });
-
-    const posData = await resPos.json();
-
-    if (!resPos.ok) {
-      toast.error(posData.message);
-    } else {
-      updateProducts(posData.products);
-      router.push("/admin/products");
-      toast.success("Cập nhật  sản phẩm thành công");
-    }
-
-    setState({ ...state, isLoading: false });
   };
 
   // filter category followed by brand
   const filterCate = async (e) => {
-    
     const response = await fetch(`${API_URL}/brands/categories/${e}`);
 
     const categories = await response.json();
@@ -176,37 +74,147 @@ function UpdateProduct(props) {
     setState((prevState) => ({
       // sử dụng cú pháp này trường hợp setState của useEffect phía trên chưa kịp cập nhật giá trị của isLoading prop
       ...prevState,
-      categoryOptions: cateOpts
+      categoryOptions: cateOpts,
     }));
-    // setProduct({ ...product, brand: e});
   };
 
-  // upload image
-  const changeImage = (e) => {
-    const reader = new FileReader();
-    if (e.target.files[0]) {
-      reader.readAsDataURL(e.target.files[0]);
-      setState({
-        ...state,
-        imageData: e.target.files[0],
-        imagePreview: URL.createObjectURL(e.target.files[0]),
-      });
+  const updateDetail = (i, e) => {
+    let newFormValues = [...product.details];
+    newFormValues[i][e.target.name] = e.target.value;
+    setProduct({ ...product, details: newFormValues });
+  };
+
+  // add new detail
+  const addNewDetail = () => {
+    console.log("Product value is " + JSON.stringify(product));
+    setProduct({
+      ...product,
+      details: [...product.details, { id: null, name: "", value: "" }],
+    });
+  };
+
+  const removeDetailItem = (index) => {
+    let updateDetail = [...product.details];
+    updateDetail.splice(index, 1);
+    setProduct({ ...product, details: updateDetail });
+  };
+
+  const setPrimaryImage = (e) => {
+    setState({
+      ...state,
+      primaryImagePrev: URL.createObjectURL(e.target.files[0]),
+      primaryImage: e.target.files[0],
+    });
+  };
+
+  // handle fetching cates and brands from DataContext - fetch API async
+  useEffect(() => {
+    // lấy ra các option brand
+    const brandOpts = listBrands.map((brand) => ({
+      value: brand.id,
+      label: brand.name,
+    }));
+
+    // lay ra cac category options
+    const cateOpts = listCates.map((cate) => ({
+      value: cate.id,
+      label: cate.name,
+    }));
+
+    if (
+      listBrands.length > 0 &&
+      listCates.length > 0 &&
+      listProds.length > 0 &&
+      router.query.updateId != null
+    ) {
+      let existedProduct = listProds.find(
+        (prod) => prod.id == router.query.updateId
+      );
+
+      setProduct(existedProduct);
+
+      let valueBrand = listBrands.find(
+        (brand) => brand.id == existedProduct.brand.id
+      ).name;
+      let valueCate = listCates.find(
+        (cate) => cate.id == existedProduct.category.id
+      ).name;
+
+      filterCate(existedProduct.brand.id);
+
+      setState((prevState) => ({
+        ...prevState,
+        brandOptions: brandOpts,
+        defaultBrand: valueBrand, // selected
+        defaultCate: valueCate,
+        imagePreview: existedProduct.primaryImage,
+        isLoading: false,
+      }));
     }
+  }, [listBrands, listCates, listProds, router.query.updateId]); // 3 deps
+
+  // upload product
+  const updateProduct = async () => {
+    let payload = {};
+
+    setState({ ...state, isLoading: true });
+
+    const formData = new FormData();
+
+    const updatePrduct = {
+      ...product,
+      category: product.category.id,
+      brand: product.brand.id,
+    };
+
+    formData.append("product", JSON.stringify(updatePrduct));
+
+    if (state.primaryImage) formData.append("primaryImage", state.primaryImage);
+
+    if (images) {
+      for (let i = 0; i < extraImage.length; i++) {
+        formData.append("extraImage", extraImage[i]);
+      }
+    }
+    const resPos = await fetch(`${NEXT_API}/api/products/${updateProdId}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    const posData = await resPos.json();
+
+    if (!resPos.ok) {
+      toast.error(posData.message);
+    } else {
+      router.push("/admin/products");
+      getProducts();
+      toast.success("Cập nhật  sản phẩm thành công");
+    }
+
+    setState({ ...state, isLoading: false });
   };
 
   return (
     <div className="p-10 border-2 border-solid">
       {state.isLoading ? (
-        <Spin />
+        <SpinTip />
       ) : (
-        <form>
-          <div className="flex flex ">
-            <div className="w-2/3">
-              <div className="flex flex-col w-1/3">
-                <label className="font-medium italic">Tên sản phẩm </label>
+        <>
+          <Row className="">
+            <Col flex="400px" className="pl-4">
+              <div className="info-1">
+                <h2 className="font-medium  text-base">About</h2>
+                <p className="text-gray-700">Basic product information</p>
+              </div>
+            </Col>
+            <Col flex="1">
+              <div className="flex flex-col">
+                <label className="font-semibold text-base">
+                  Tên sản phẩm *
+                </label>
                 <input
                   type="text"
-                  className="p-1 border-2 border-solid focus:outline-none rounded-xl  justify-center mt-2"
+                  className="p-1.5 border-2 border-solid required:border-red-500 focus:border-black rounded-md justify-center hover:border-purple-400 mt-2"
                   placeholder="Nhập tên sản phẩm"
                   value={product.name}
                   onChange={(e) =>
@@ -215,39 +223,30 @@ function UpdateProduct(props) {
                 />
               </div>
 
-              <div className="flex flex-col mt-4">
-                <label className="font-medium italic"> Enabled </label>
-                <Switch
-                  className="w-4"
-                  // defaultChecked
-                  checked={product.enabled}
-                  onClick={() =>
-                    setProduct({ ...product, enabled: !product.enabled })
-                  }
-                />
-              </div>
-
-              <div className="flex mt-6 mb-2">
+              <div className="flex flex mt-2">
                 <div className="flex flex-col ">
-                  <label className="font-medium italic mt-3">Discount</label>
+                  <label className="font-semibold text-base mt-3">
+                    Discount
+                  </label>
                   <InputNumber
                     style={{
                       width: 200,
                       marginTop: 4,
                     }}
                     defaultValue="0"
-                    value={product.discount_percent}
                     min="0"
                     max="1"
                     step="0.1"
+                    value={product.discount_percent}
                     onChange={(e) =>
                       setProduct({ ...product, discount_percent: e })
                     }
                     stringMode
                   />
                 </div>
-                <div className="flex flex-col ml-3">
-                  <label className="font-medium italic mt-3">Price </label>
+
+                <div className="flex flex-col ml-8 text-base">
+                  <label className="font-medium mt-3">Price </label>
                   <InputNumber
                     style={{
                       width: 200,
@@ -266,19 +265,19 @@ function UpdateProduct(props) {
                 </div>
               </div>
 
-              <div className="flex align-center items-center">
+              <div className="flex align-center items-cente mt-2 text-base">
                 <div className="flex flex-col">
-                  <label className="font-medium italic mt-3">Quantity </label>
+                  <label className="font-medium mt-3">Quantity </label>
                   <InputNumber
                     style={{
                       width: 200,
                       marginTop: 4,
                     }}
-                    value={product.productQuantity}
                     defaultValue="1"
                     min="1"
                     max="1000000"
                     step="1"
+                    value={product.productQuantity}
                     onChange={(e) =>
                       setProduct({ ...product, productQuantity: e })
                     }
@@ -287,7 +286,7 @@ function UpdateProduct(props) {
                 </div>
 
                 <div className="flex flex-col mt-6 ml-8">
-                  <label className="font-medium italic"> In Stock </label>
+                  <label className="font-medium"> In Stock </label>
                   <Switch
                     className="w-4"
                     defaultChecked
@@ -297,89 +296,243 @@ function UpdateProduct(props) {
                     }
                   />
                 </div>
+
+                <div className="flex flex-col mt-6 ml-20">
+                  <label className="font-semibold"> Enabled </label>
+                  <Switch
+                    className="w-4"
+                    // defaultChecked
+                    checked={product.enabled}
+                    onClick={() =>
+                      setProduct({ ...product, enabled: !product.enabled })
+                    }
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col">
-                <label className="font-medium italic mt-3">Brand </label>
-                <Select
-                  defaultValue={state.defaultBrand}
-                  style={{
-                    width: 120,
-                  }}
-                  onChange={filterCate}
-                  options={state.brandOptions}
-                  disabled
-                />
+              <div className="flex flex-col mt-6">
+                <label className="font-semibold"> Primary Image </label>
+                <div className="flex align-center items-center mt-2">
+                  <Image
+                    src={icon_upload}
+                    width={50}
+                    height={50}
+                    className="rounded-full"
+                  />
+
+                  <Input
+                    className="w-1/3 ml-8"
+                    tabIndex={"-1"}
+                    type="file"
+                    accept="image/png,image/jpg,image/jpeg"
+                    multiple
+                    encType="multipart/form-data"
+                    autoComplete="off"
+                    // style={{ display: "none" }}
+                    required={true}
+                    onChange={(e) => setPrimaryImage(e)}
+                  />
+                </div>
+              </div>
+            </Col>
+          </Row>
+
+          <Row className="mt-4">
+            <div className="">
+              <Card style={{ width: 300, height: 300 }}>
+                {state.primaryImagePrev ? (
+                  <img src={state.primaryImagePrev} alt="primary-image" />
+                ) : (
+                  <img src={product.primaryImage} alt="primary-image" />
+                )}
+              </Card>
+            </div>
+          </Row>
+
+          <hr className="border-1 border-gray-200 mt-10" />
+
+          <Row className="mt-10">
+            <Col flex="400px" className="pl-4">
+              <div className="info-1">
+                <h2 className="font-medium  text-base">Brand & category</h2>
+                <p className="text-gray-700">In brand and category</p>
+              </div>
+            </Col>
+            <Col flex="1">
+              <div className="flex flex-col mt-2 text-base">
+                <div className="flex flex-col">
+                  <label className="font-semibold  mt-3 mb-2">Brand </label>
+                  <Select
+                    defaultValue={state.defaultBrand}
+                    style={
+                      {
+                        // width: 120,
+                      }
+                    }
+                    onChange={filterCate}
+                    options={state.brandOptions}
+                    disabled
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="font-semibold  mt-3">Category </label>
+
+                  <select
+                    className="mt-2 border-2 border-solid p-1 px-4 py-2 rounded-lg hover:border-purple-100"
+                    onChange={(e) =>
+                      setProduct({ ...product, category: e.target.value })
+                    }
+                  >
+                    {state.categoryOptions.map((category, index) => {
+                      return (
+                        <option key={index} value={category.value}>
+                          {category.label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
 
-              <div className="flex flex-col">
-              
-                <label className="font-medium italic mt-3">Category </label>
-
-           
-                <Select
-                  defaultValue={state.defaultCate}
-                  style={{
-                    width: 120,
-                  }}
-                  onChange={(e) => setProduct({ ...product, category: e })}
-                  options={state.categoryOptions}
-                />
-              </div>
-
-              <div className="mt-6">
-                <label className="font-medium italic mb-6"> Description</label>
+              <div className="mt-6 ">
+                <label className="font-semibold text-base mb-10">
+                  {" "}
+                  Description
+                </label>
                 <div>
                   <ReactQuill
                     theme="snow"
                     value={product.description}
                     onChange={(e) => setProduct({ ...product, description: e })}
+                    style={{
+                      height: 200,
+                    }}
                   />
-
-                  <div
-                    className="mt-10 text-black"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
-                  ></div>
                 </div>
               </div>
+            </Col>
+          </Row>
 
-              <div className="flex justify-center">
-                <button
-                  className="bg-primary-700 hover:bg-primary-900 text-white p-4 rounded-md px-6 py-2.5 mt-6 self-center"
-                  onClick={() => updateProduct()}
-                >
-                  Submit
-                </button>
+          <hr className="border-1 border-gray-200 mt-20" />
+
+          <Row className="mt-10">
+            <Col flex="400px" className="pl-4">
+              <div className="info-1">
+                <h2 className="font-medium  text-base">Extra detail</h2>
+                <p className="text-gray-700">Detail information</p>
               </div>
-            </div>
+            </Col>
+            <Col flex="1">
+              <button
+                className="bg-black text-white px-4 py-1 rounded-md mb-4 hover:bg-blue-500"
+                onClick={addNewDetail}
+              >
+                {" "}
+                Add{" "}
+              </button>
+              {product.details.map((element, index) => (
+                <div className="mb-4" key={index}>
+                  <label>Name </label>
+                  <input
+                    className="border border-1 border-solid border-black rounded-sm ml-4 text-center"
+                    type="text"
+                    name="name"
+                    value={element.name}
+                    onChange={(e) => updateDetail(index, e)}
+                  />
+                  <label className="ml-4">Value</label>
+                  <input
+                    className="border border-1 border-solid border-black rounded-sm ml-4 text-center"
+                    type="text"
+                    name="value"
+                    value={element.value}
+                    onChange={(e) => updateDetail(index, e)}
+                  />
 
-            <div className="flex flex-col">
-              <div>
-                <label>Upload image</label>
+                  {index ? (
+                    <button
+                      type="button"
+                      className="bg-red-400 ml-4 px-2.5 py-1 rounded-md hover:text-white hover:bg-red-700"
+                      onClick={() => removeDetailItem(index)}
+                    >
+                      Remove
+                    </button>
+                  ) : null}
+                </div>
+              ))}
+            </Col>
+          </Row>
+
+          <hr className="border-1 border-gray-200 mt-20" />
+
+          <Row className="mt-10">
+            <Col flex="400px" className="pl-4">
+              <div className="info-1">
+                <h2 className="font-medium  text-base">Extra image</h2>
+                <p className="text-gray-700">Product Image</p>
+              </div>
+            </Col>
+            <Col flex="1">
+              <div className="flex align-center items-center mt-2">
+                <Image
+                  src={icon_upload}
+                  width={100}
+                  height={100}
+                  className="rounded-full"
+                />
+
                 <Input
+                  className="w-1/3 ml-8"
+                  tabIndex={"-1"}
                   type="file"
-                  accept="image/*"
+                  accept="image/png,image/jpg,image/jpeg"
+                  encType="multipart/form-data"
+                  multiple
+                  autoComplete="off"
+                  // style={{ display: "none" }}
                   required={true}
                   onChange={(e) => changeImage(e)}
                 />
               </div>
+            </Col>
+          </Row>
 
-              <div>
-                {state.imagePreview && (
-                  <div className="mt-20">
-                    <Image
-                      width={200}
-                      height={200}
-                      id="imagePreview"
-                      src={state.imagePreview}
-                      alt="image_preview"
-                    />
+          <Row className="mt-4">
+            <div className="grid gap-4 grid-cols-3 place-items-center">
+              {product.images.map((image, index) => (
+                <div key={index}>
+                  <Card style={{ width: 300, height: 300 }}>
+                    <img src={image.imageProduct} alt="extra-image" />
+                  </Card>
+                </div>
+              ))}
+              {images &&
+                images.map((image) => (
+                  <div key={image.name}>
+                    <Card style={{ width: 300, height: 300 }}>
+                      <img src={image.url} />
+                    </Card>
                   </div>
-                )}
-              </div>
+                ))}
             </div>
+          </Row>
+
+          <div className="flex justify-center">
+            <button
+              className="bg-black text-white hover:bg-primary-700 font-semibold rounded-md px-4 py-2 mt-6 border border-1 border-solid rounded-md self-center mr-10"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </button>
+            <button
+              className="bg-black text-white hover:bg-primary-700 font-semibold rounded-md px-4 py-2 mt-6 border border-1 border-solid rounded-md self-center"
+              onClick={() => updateProduct()}
+            >
+              Submit
+            </button>
           </div>
-        </form>
+        </>
       )}
     </div>
   );

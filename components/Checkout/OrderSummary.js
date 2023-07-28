@@ -1,19 +1,19 @@
-import CartItem from "@/components/Cart/CartItem";
-import CartContext from "@/context/CartContext";
-import CustomerLayout from "@/layouts/CustomerLayout";
-import { Button } from "antd";
-import React, { useContext } from "react";
+import React from "react";
+import AddressCard from "../AddressCard/AddressCard";
+import CartItem from "../Cart/CartItem";
+import {Button} from "@mui/material";
 
-function Cart(props) {
-  const { cart } = useContext(CartContext);
-
+function OrderSummary(props) {
   return (
     <div>
+      <AddressCard />
+
+      <div>
       <div class="grid grid-cols-3 gap-4">
         <div className="col-span-2 ">
-          {cart.map((cartItem) => (
-            <CartItem data={cartItem} />
-          ))}
+          {
+            [1,2,3,4,5,6].map(e => <CartItem />)
+          }
         </div>
         <div className="px-5">
           <div className="border p-4">
@@ -45,9 +45,8 @@ function Cart(props) {
         </div>
       </div>
     </div>
+    </div>
   );
 }
 
-Cart.getLayout = (page) => <CustomerLayout>{page}</CustomerLayout>;
-
-export default Cart;
+export default OrderSummary;

@@ -5,6 +5,7 @@ import Head from "next/head";
 import { ToastContainer } from "react-toastify";
 import { DataProvider } from "@/context/DataContext";
 import { FilterProvider } from "@/context/FilterContext";
+import { CartProvider } from "@/context/CartContext";
 
 export default function App(props) {
   const { Component, pageProps, title, keywords, description } = props;
@@ -25,9 +26,11 @@ export default function App(props) {
       </Head>
       <AuthProvider>
         <DataProvider>
-          <FilterProvider>
-            {getLayout(<Component {...pageProps} />)}
-          </FilterProvider>
+          <CartProvider>
+            <FilterProvider>
+              {getLayout(<Component {...pageProps} />)}
+            </FilterProvider>
+          </CartProvider>
         </DataProvider>
       </AuthProvider>
     </>

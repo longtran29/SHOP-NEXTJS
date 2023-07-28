@@ -43,7 +43,6 @@ export function AuthProvider({ children }) {
 
     if (response.ok) {       
       setUser(data.user);
-      // setError(null);
     } else {
       setError(data.message); // như phía trên đã setError(null) trước - bởi vì data.message value không đổi nên state này không được update và địa chỉ ô nhớ cũng k được update, do đó bên auth-form sẽ không cập nhật sự thay đổi -> useEffect của auth-form không được thực thi
     }

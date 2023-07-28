@@ -8,6 +8,8 @@ export const FilterProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, intialState);
   const { listProds } = useContext(DataContext);
 
+  console.log("Ds product filter provider " + JSON.stringify(listProds));
+
 
     // load initially for all_prod & filter_prod
   useEffect(() => {
