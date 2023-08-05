@@ -26,7 +26,7 @@ function ProductCard(props) {
               {productDetails.original_price}$
             </span>
             <span className="pt-1 text-xs text-gray-500 line-through ml-2 text-xl font-extralight text-gray-600">
-              {productDetails.original_price - productDetails.original_price* productDetails.discount_percent}$
+              {(productDetails.original_price - productDetails.original_price* productDetails.discount_percent).toFixed(2)}$
             </span>
 
             <span className="pt-1 text-xs text-gray-700 text-green-500 ml-2 font-bold text-xl">

@@ -1,11 +1,10 @@
 import AuthContext from "@/context/AuthContext";
 import Link from "next/link";
-import { useContext } from "react";
-import { FaSignInAlt } from "react-icons/fa";
-import { BsCart } from "react-icons/bs";
-import { GoSignIn } from "react-icons/go";
-import { BiUser } from "react-icons/bi";
-import logo from "../public/images/uniqlo_logo.png";
+import React, { useContext, useEffect } from "react";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Avatar from "@mui/material/Avatar";
+import logo from "../public/images/logo1.png";
 import Image from "next/image";
 
 import { Fragment, useState } from "react";
@@ -18,71 +17,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
+import { Divider, ListItemIcon, Menu, MenuItem } from "@mui/material";
+import { Logout, PersonAdd } from "@mui/icons-material";
+import CartContext from "@/context/CartContext";
 
 const navigation = {
   categories: [
-    {
-      id: "women",
-      name: "Women",
-      featured: [
-        {
-          name: "New Arrivals",
-          href: "#",
-          imageSrc:
-            "https://tailwindui.com/img/ecommerce-images/mega-menu-category-01.jpg",
-          imageAlt:
-            "Models sitting back to back, wearing Basic Tee in black and bone.",
-        },
-        {
-          name: "Basic Tees",
-          href: "#",
-          imageSrc:
-            "https://tailwindui.com/img/ecommerce-images/mega-menu-category-02.jpg",
-          imageAlt:
-            "Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.",
-        },
-      ],
-      sections: [
-        {
-          id: "clothing",
-          name: "Clothing",
-          items: [
-            { name: "Tops", href: "#" },
-            { name: "Dresses", href: "#" },
-            { name: "Pants", href: "#" },
-            { name: "Denim", href: "#" },
-            { name: "Sweaters", href: "#" },
-            { name: "T-Shirts", href: "#" },
-            { name: "Jackets", href: "#" },
-            { name: "Activewear", href: "#" },
-            { name: "Browse All", href: "#" },
-          ],
-        },
-        {
-          id: "accessories",
-          name: "Accessories",
-          items: [
-            { name: "Watches", href: "#" },
-            { name: "Wallets", href: "#" },
-            { name: "Bags", href: "#" },
-            { name: "Sunglasses", href: "#" },
-            { name: "Hats", href: "#" },
-            { name: "Belts", href: "#" },
-          ],
-        },
-        {
-          id: "brands",
-          name: "Brands",
-          items: [
-            { name: "Full Nelson", href: "#" },
-            { name: "My Way", href: "#" },
-            { name: "Re-Arranged", href: "#" },
-            { name: "Counterfeit", href: "#" },
-            { name: "Significant Other", href: "#" },
-          ],
-        },
-      ],
-    },
     {
       id: "men",
       name: "Men",
@@ -158,13 +98,27 @@ export default function Header() {
 
   const [profileOpen, setProfileOpen] = useState(false);
 
-  console.log("User is " + JSON.stringify(user));
-  const [open, setOpen] = useState(false);
+  const { cart, getCart } = useContext(CartContext);
+
   const router = useRouter();
 
-  const profile = () => {
-    router.push("/account/profile");
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openProfile = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  console.log("User info is " , JSON.stringify(user ) , " user 1 ", user);
+
+  useEffect(() => {
+    if (user != null) {
+      getCart();
+    }
+  }, []);
 
   function DropdownItem(props) {
     return (
@@ -379,10 +333,10 @@ export default function Header() {
                 <Link href="/">
                   <span className="sr-only">Bamboo Shop</span>
                   <Image
-                    className="h-8 w-auto"
+                    className="h-8 w-auto cover"
                     src={logo}
-                    width={40}
-                    height={40}
+                    width={150}
+                    height={150}
                     alt=""
                   />
                 </Link>
@@ -530,10 +484,18 @@ export default function Header() {
                   )}
 
                   {user && (
-                    <BiUser
-                      className="text-xl hover:cursor-pointer"
-                      onClickCapture={() => setProfileOpen(!profileOpen)}
-                    />
+                    <Tooltip title="Account settings">
+                      <IconButton
+                        onClick={handleClick}
+                        size="small"
+                        sx={{ ml: 2 }}
+                        aria-controls={open ? "account-menu" : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                      >
+                        <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                      </IconButton>
+                    </Tooltip>
                   )}
                 </div>
 
@@ -564,43 +526,77 @@ export default function Header() {
                 </div>
 
                 {/* Cart */}
-                <div className="ml-4 flow-root lg:ml-6">
-                  <a href="#" className="group -m-2 flex items-center p-2">
-                    <ShoppingBagIcon
-                      className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                      aria-hidden="true"
-                    />
-                    <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                      0
-                    </span>
-                    <span className="sr-only">items in cart, view bag</span>
-                  </a>
-                </div>
+                {user && (
+                  <div
+                    className="ml-4 flow-root lg:ml-6"
+                    onClick={() => router.push("/cart")}
+                  >
+                    <a href="#" className="group -m-2 flex items-center p-2">
+                      <ShoppingBagIcon
+                        className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+                        {cart.length}
+                      </span>
+                      <span className="sr-only">items in cart, view bag</span>
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </nav>
-
-        <div
-          className={`dropdown-menu  ${profileOpen ? "active" : "inactive"}`}
+        <Menu
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={openProfile}
+          onClose={handleClose}
+          onClick={handleClose}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              overflow: "visible",
+              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              mt: 1.5,
+              "& .MuiAvatar-root": {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+              "&:before": {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: "background.paper",
+                transform: "translateY(-50%) rotate(45deg)",
+                zIndex: 0,
+              },
+            },
+          }}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <h3>
-            {user && user.username}
-            <br />
-          </h3>
-          <ul>
-            <DropdownItem
-              img={<SettingOutlined />}
-              text={"My Profile"}
-              handler={profile}
-            />
-            <DropdownItem
-              img={<LogoutOutlined />}
-              text={"Logout"}
-              handler={logout}
-            />
-          </ul>
-        </div>
+          <MenuItem onClick={handleClose}>
+            <Avatar /> Profile
+          </MenuItem>
+          <MenuItem onClick={handleClose}>
+            <Avatar /> My account
+          </MenuItem>
+          <Divider />
+
+          <MenuItem onClick={logout}>
+            <ListItemIcon>
+              <Logout fontSize="small" />
+            </ListItemIcon>
+            Logout
+          </MenuItem>
+        </Menu>
       </header>
     </div>
   );

@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 
 function Products(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { updateProducts } = useContext(DataContext);
+  const { getProducts } = useContext(DataContext);
   const { filter_products, updateFilterValue } = useFilterContext();
   const [state, setState] = useState({
     imagePreview: "",
@@ -74,7 +74,7 @@ function Products(props) {
           if (!resDel.ok) {
             toast.error(delData.message);
           } else {
-            updateProducts(delData.products);
+            getProducts();
             toast.success("Xoá thành công");
           }
         };
@@ -93,7 +93,7 @@ function Products(props) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        status: status,
+        status: !status,
       }),
     });
 
@@ -102,7 +102,7 @@ function Products(props) {
     if (!resPut.ok) {
       toast.error(data.message);
     } else {
-      updateProducts(data.products);
+      getProducts();
     }
   };
 
@@ -154,6 +154,15 @@ function Products(props) {
       responsive: ["lg"],
       render: (imageUrl) => (
         <Image alt={imageUrl} src={imageUrl} height={40} width={40} />
+      ),
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      responsive: ["lg"],
+      render:  (_, record) => (
+        <h2>{record.category.name}</h2>
       ),
     },
 

@@ -1,4 +1,4 @@
-import { NEXT_API } from "@/config";
+import { API_URL, NEXT_API } from "@/config";
 import { createContext, useEffect, useState } from "react";
 
 const DataContext = createContext();
@@ -11,6 +11,7 @@ export function DataProvider({ children }) {
     isLoading: false,
   });
   const [error, setError] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
     getBrands();
@@ -25,6 +26,7 @@ export function DataProvider({ children }) {
   }, []);
 
   const getProducts = async () => {
+    console.log("Da vao get products");
     setState((prevState) => ({ ...prevState, isLoading: true }));
     const response = await fetch(`${NEXT_API}/api/products`, {
       method: "GET",
@@ -32,10 +34,13 @@ export function DataProvider({ children }) {
 
     const data = await response.json();
 
+    console.log("Ds products  " + JSON.stringify(data));
+
     if (!response.ok) {
       setError(data.message);
     } else {
       updateProducts(data.products); // default return object json with categories prop
+      return data.products;
     }
     setState((prevState) => ({ ...prevState, isLoading: false }));
   };
@@ -84,6 +89,43 @@ export function DataProvider({ children }) {
     setState((prevState) => ({ ...prevState, isLoading: false }));
   };
 
+  const getUserInformation = async () => {
+    setState({ ...state, isLoading: true });
+    const response = await fetch(`${NEXT_API}/api/user`, {
+      method: "GET",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return data.message;
+    } else {
+      setUserInfo(data.user);
+    }
+    setState((prevState) => ({ ...prevState, isLoading: false }));
+  };
+
+  const addNewAddress = async (payload) => {
+    setState({ ...state, isLoading: true });
+    const response = await fetch(`${NEXT_API}/api/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return data.message;
+    } else {
+      console.log("User info is " + JSON.stringify(data));
+      setUserInfo(data.user);
+    }
+    setState((prevState) => ({ ...prevState, isLoading: false }));
+  };
+
   const value = {
     listCates: state.listCates,
     updateCategories,
@@ -92,12 +134,43 @@ export function DataProvider({ children }) {
     error: error,
     listProds: state.listProds,
     updateProducts,
-    isLoading : state.isLoading,
+    isLoading: state.isLoading,
     getCategories,
-    getBrands
+    getBrands,
+    getProducts,
+    addNewAddress,
+    userInfo: userInfo,
+    getUserInformation,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }
+
+export const getProductDetail = async () => {
+  const postRes = await fetch(`http://192.168.1.113:3000/products/5`, {
+    method: "GET",
+  });
+
+  const resDel = await postRes.json();
+
+  if (!postRes.ok) {
+    res.status(500).json({ message: resDel.message });
+  } else {
+    return resDel;
+  }
+};
+export const getAllProduct = async () => {
+  const resGet = await fetch(`${API_URL}/products`, {
+    method: "GET",
+  });
+
+  const dataPos = await resGet.json();
+
+  if (!resGet.ok) {
+    console.log("Loi la ", JSON.stringify(dataPos));
+  } else {
+    return dataPos;
+  }
+};
 
 export default DataContext;

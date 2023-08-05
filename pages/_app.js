@@ -5,6 +5,12 @@ import Head from "next/head";
 import { ToastContainer } from "react-toastify";
 import { DataProvider } from "@/context/DataContext";
 import { FilterProvider } from "@/context/FilterContext";
+import { CartProvider } from "@/context/CartContext";
+import { OrderProvider } from "@/context/OrderContext";
+import {
+  PayPalScriptProvider
+} from "@paypal/react-paypal-js";
+
 
 export default function App(props) {
   const { Component, pageProps, title, keywords, description } = props;
@@ -25,9 +31,21 @@ export default function App(props) {
       </Head>
       <AuthProvider>
         <DataProvider>
-          <FilterProvider>
-            {getLayout(<Component {...pageProps} />)}
-          </FilterProvider>
+          <OrderProvider>
+            <CartProvider>
+              <FilterProvider>
+                <PayPalScriptProvider
+                  options={{
+                    clientId: "test",
+                    components: "buttons",
+                    currency: "USD",
+                  }}
+                >
+                  {getLayout(<Component {...pageProps} />)}
+                </PayPalScriptProvider>
+              </FilterProvider>
+            </CartProvider>
+          </OrderProvider>
         </DataProvider>
       </AuthProvider>
     </>

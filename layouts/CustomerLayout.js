@@ -6,7 +6,7 @@ export default function CustomerLayout({ children }) {
     <div>
       <Header />
 
-      <div className="p-2">
+      <div className="p-10">
         <div>{children}</div>
       </div>
       <Footer />

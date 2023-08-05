@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import { TabContext, TabPanel, TabList } from "@mui/lab";
 import ProductInfomation from "../Product/ProductInfomation";
-import { FaStar } from "react-icons/fa";
 import ReviewProduct from "./ReviewProduct";
 
 function ProductTab({ data }) {
@@ -28,7 +27,7 @@ function ProductTab({ data }) {
           </TabList>
         </Box>
         <TabPanel value="information">
-          <ProductInfomation dataProduct={data.description} />
+          <ProductInfomation dataInfor = {data} />
         </TabPanel>
         <TabPanel value="review">
           <ReviewProduct />

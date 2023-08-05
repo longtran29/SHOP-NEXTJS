@@ -42,16 +42,38 @@ function AddProduct(props) {
     brand: null,
     category: null,
     productQuantity: 1,
+    details: [{ name: "", value: "" }],
   });
-  const { listBrands, listCates, updateProducts, listProds } =
+  const { listBrands, listCates, getProducts, listProds } =
     useContext(DataContext);
   const [images, setImages] = useState([]);
 
   const { defaultCate } = state;
 
-  //
-  //
+  const { details } = product;
 
+  // const [details, setdetails] = useState([{ name: "", value: "" }]);
+
+  const addNewDetail = () => {
+    setProduct({
+      ...product,
+      details: [...details, { name: "", value: "" }],
+    });
+  };
+
+  const removeDetailItem = (index) => {
+    let updateDetail = [...details];
+    updateDetail.splice(index, 1);
+    setProduct({ ...product, details: updateDetail });
+  };
+
+  const updateDetail = (i, e) => {
+    let newFormValues = [...details];
+    newFormValues[i][e.target.name] = e.target.value;
+    setProduct({ ...product, details: newFormValues });
+  };
+
+  console.log("Dsanh sach la " + JSON.stringify(details));
   // handle fetching cates and brands from DataContext - fetch API async
   useEffect(() => {
     const brandOpts = listBrands.map((brand) => ({
@@ -82,8 +104,6 @@ function AddProduct(props) {
     }
   }, [listBrands, listCates]); // 2 dependency
 
-  //
-
   // upload product
   const createProduct = async () => {
     if (state.primaryImage == null) {
@@ -110,7 +130,7 @@ function AddProduct(props) {
     if (!resPos.ok) {
       toast.error(posData.message);
     } else {
-      updateProducts(posData.products);
+      getProducts();
       router.push("/admin/products");
       toast.success("Thêm sản phẩm thành công");
     }
@@ -385,6 +405,57 @@ function AddProduct(props) {
           <Row className="mt-10">
             <Col flex="400px" className="pl-4">
               <div className="info-1">
+                <h2 className="font-medium  text-base">Extra detail</h2>
+                <p className="text-gray-700">Detail information</p>
+              </div>
+            </Col>
+            <Col flex="1">
+              {console.log("Legnth is " + details.length)}
+              <button
+                className="bg-black text-white px-4 py-1 rounded-md mb-4 hover:bg-blue-500"
+                onClick={addNewDetail}
+              >
+                {" "}
+                Add{" "}
+              </button>
+              {details.map((element, index) => (
+                <div className="mb-4" key={index}>
+                  <label>Name </label>
+                  <input
+                    className="border border-1 border-solid border-black rounded-sm ml-4 text-center"
+                    type="text"
+                    name="name"
+                    value={element.name}
+                    onChange={(e) => updateDetail(index, e)}
+                  />
+                  <label className="ml-4">Value</label>
+                  <input
+                    className="border border-1 border-solid border-black rounded-sm ml-4 text-center"
+                    type="text"
+                    name="value"
+                    value={element.value}
+                    onChange={(e) => updateDetail(index, e)}
+                  />
+
+                  {index ? (
+                    <button
+                      type="button"
+                      className="bg-red-400 ml-4 px-2.5 py-1 rounded-md hover:text-white hover:bg-red-700"
+                      onClick={() => removeDetailItem(index)}
+                    >
+                      Remove
+                    </button>
+                  ) : null}
+                </div>
+              ))}
+            </Col>
+          </Row>
+
+          <hr className="border-1 border-gray-200 mt-20" />
+
+          <Row className="mt-10">
+            <Col flex="400px" className="pl-4">
+              <div className="info-1">
                 <h2 className="font-medium  text-base">Extra image</h2>
                 <p className="text-gray-700">Product Image</p>
               </div>
@@ -427,8 +498,14 @@ function AddProduct(props) {
           </Row>
 
           <div className="flex justify-center">
+          <button
+              className="bg-black text-white hover:bg-primary-700 font-semibold rounded-md px-4 py-2 mt-6 border border-1 border-solid rounded-md self-center mr-10"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </button>
             <button
-              className="bg-black text-white hover:bg-primary-700 font-semibold rounded-md px-4 py-2 mt-6 border border-1 border-solid rounded-md self-center"
+              className="bg-black text-white hover:bg-red-400 font-semibold rounded-md px-4 py-2 mt-6 border border-1 border-solid rounded-md self-center ml-10"
               onClick={() => createProduct()}
             >
               Submit

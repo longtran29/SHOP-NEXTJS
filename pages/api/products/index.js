@@ -63,6 +63,23 @@ async function products(req, res) {
     } else {
       res.status(200).json({ products: dataPos });
     }
+  } else if (req.method == "GET") {
+    console.log("Da vao get trong api product");
+    const resGet = await fetch(`${API_URL}/products`, {
+      method: "GET",
+    });
+
+    const dataPos = await resGet.json();
+
+    console.log("Da qua datapost");
+
+    if (!resGet.ok) {
+      console.log("Loi la " + JSON.stringify(dataPos));
+      res.status(500).json({ message: dataPos.message });
+    } else {
+      console.log("ds pros " + JSON.stringify(dataPos));
+      res.status(200).json({ products: dataPos });
+    }
   }
 }
 
