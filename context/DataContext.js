@@ -11,6 +11,7 @@ export function DataProvider({ children }) {
     isLoading: false,
   });
   const [error, setError] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
     getBrands();
@@ -88,6 +89,43 @@ export function DataProvider({ children }) {
     setState((prevState) => ({ ...prevState, isLoading: false }));
   };
 
+  const getUserInformation = async () => {
+    setState({ ...state, isLoading: true });
+    const response = await fetch(`${NEXT_API}/api/user`, {
+      method: "GET",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return data.message;
+    } else {
+      setUserInfo(data.user);
+    }
+    setState((prevState) => ({ ...prevState, isLoading: false }));
+  };
+
+  const addNewAddress = async (payload) => {
+    setState({ ...state, isLoading: true });
+    const response = await fetch(`${NEXT_API}/api/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return data.message;
+    } else {
+      console.log("User info is " + JSON.stringify(data));
+      setUserInfo(data.user);
+    }
+    setState((prevState) => ({ ...prevState, isLoading: false }));
+  };
+
   const value = {
     listCates: state.listCates,
     updateCategories,
@@ -100,6 +138,9 @@ export function DataProvider({ children }) {
     getCategories,
     getBrands,
     getProducts,
+    addNewAddress,
+    userInfo: userInfo,
+    getUserInformation,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

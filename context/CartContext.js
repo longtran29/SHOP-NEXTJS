@@ -1,35 +1,39 @@
 import { NEXT_API } from "@/config";
 import { toast } from "react-toastify";
+import AuthContext from "./AuthContext";
 
-const { createContext, useState, useEffect } = require("react");
+const { createContext, useState, useEffect, useContext } = require("react");
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [message, setMessage] = useState("");
+  const {user} = useContext(AuthContext);
 
 
   useEffect(() => {
-    getCart();
-  }, [])
+    if(user) {
+      console.log("Ben trong useeffect cart context");
+      getCart();
+    }
+  }, [user]);
+
 
   const getCart = async () => {
+    console.log("Da vao trong nay ne");
     const resGet = await fetch(`${NEXT_API}/api/cart`, {
-        method: "GET"      
-      });
-  
-      const dataGet = await resGet.json();
-  
-      if (!resGet.ok) {
-        toast.error("Lỗi lấy danh sách sản phẩm giỏ hàng");
-      } else {
-        console.log("Gio hang la " , JSON.stringify(dataGet.cart));
-        setCart(dataGet.cart);
-      }
+      method: "GET",
+    });
 
-  }
+    const dataGet = await resGet.json();
 
+    if (!resGet.ok) {
+      toast.error("Lỗi lấy danh sách sản phẩm giỏ hàng");
+    } else {
+      setCart(dataGet.cart);
+    }
+  };
 
   const addItemToCart = async (payload) => {
     const resPost = await fetch(`${NEXT_API}/api/cart`, {
@@ -42,10 +46,9 @@ export function CartProvider({ children }) {
     const dataPos = await resPost.json();
 
     if (!resPost.ok) {
-      toast.error("Lỗi thêm sản phẩm vào giỏ");
+      toast.error(dataPos.message);
     } else {
-    //   setCart(dataPos);
-    getCart();
+      getCart();
       toast.success("Thêm vào giỏ thành công");
     }
   };
@@ -54,6 +57,8 @@ export function CartProvider({ children }) {
     cart,
     addItemToCart,
     message,
+    getCart,
+    setCart
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
