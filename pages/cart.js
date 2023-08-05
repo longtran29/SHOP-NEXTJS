@@ -1,49 +1,39 @@
 import CartItem from "@/components/Cart/CartItem";
+import CartSummary from "@/components/Cart/CartSummary";
+import AuthContext from "@/context/AuthContext";
 import CartContext from "@/context/CartContext";
 import CustomerLayout from "@/layouts/CustomerLayout";
 import { Button } from "antd";
-import React, { useContext } from "react";
+import { useRouter } from "next/router";
+import React, { useContext, useEffect } from "react";
 
 function Cart(props) {
-  const { cart } = useContext(CartContext);
+  const { cart, getCart } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      getCart();
+    }
+  }, [user]); // add dep to handle updated user to get the cart
+
+  console.log("Ds cart trong la " + JSON.stringify(cart));
 
   return (
     <div>
-      <div class="grid grid-cols-3 gap-4">
-        <div className="col-span-2 ">
-          {cart.map((cartItem) => (
-            <CartItem data={cartItem} />
-          ))}
-        </div>
-        <div className="px-5">
-          <div className="border p-4">
-            <p className="uppercase font-bold opacity-60">Price details</p>
-            <hr />
-            <div className="space-y-3 font-semibold ">
-              <div className="flex justify-between pt-3">
-                <span>Price</span>
-                <span>500 $</span>
-              </div>
-              <div className="flex justify-between pt-3 ">
-                <span>Discount</span>
-                <span className="text-green-600">500 $</span>
-              </div>
-              <div className="flex justify-between pt-3 ">
-                <span>Delivery</span>
-                <span className="text-green-600">500 $</span>
-              </div>
-              <hr />
-              <div className="flex justify-between pt-3 ">
-                <span>Total Amount</span>
-                <span className="text-green-600">500 $</span>
-              </div>
-              <Button className="mt-5 w-full bg-purple-600 text-white">
-                Checkout
-              </Button>
-            </div>
+      {cart.length > 0 ? (
+        <div classNam="grid grid-cols-3 gap-4">
+          <div className="col-span-2 ">
+            {cart.map((cartItem, index) => (
+              <CartItem data={cartItem} key={index} />
+            ))}
           </div>
+          <CartSummary />
         </div>
-      </div>
+      ) : (
+        <h2>Không có sản phẩm nào trong giỏ hàng</h2>
+      )}
     </div>
   );
 }

@@ -9,17 +9,28 @@ import CustomerLayout from "@/layouts/CustomerLayout";
 import { useRouter } from "next/router";
 import DeliveryAddressForm from "@/components/Checkout/DeliveryAddressForm";
 import OrderSummary from "@/components/Checkout/OrderSummary";
+import Payment from "@/components/payment/Payment";
+import OrderContext from "@/context/OrderContext";
+import { NEXT_API } from "@/config";
+import { toast } from "react-toastify";
+import CartContext from "@/context/CartContext";
 
 const steps = ["Login", "Delivery address", "Order summary", "Payment"];
 
 function Checkout(props) {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
+
   const router = useRouter();
 
-  console.log("Value router " + JSON.stringify(router.query));
+  const { deliveryAddress, paymentMethod } = React.useContext(OrderContext);
+  console.log("Address is " + JSON.stringify(deliveryAddress));
 
-  //   const step = new URLSearchParams(router.query).get("step");
+  const { setCart, getCart } = React.useContext(CartContext);
+  React.useEffect(() => {
+    const step = new URLSearchParams(router.query).get("step");
+    setActiveStep(parseInt(step) || 2);
+  }, [router.query]);
 
   const getNumberOfSteps = (step) => {
     switch (step) {
@@ -29,6 +40,8 @@ function Checkout(props) {
         return <DeliveryAddressForm />;
       case 2:
         return <OrderSummary />;
+      case 3:
+        return <Payment />;
     }
   };
 
@@ -49,10 +62,12 @@ function Checkout(props) {
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
+    router.push(`/checkout?step=${activeStep + 1}`);
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    router.push(`/checkout?step=${activeStep - 1}`);
   };
 
   const handleSkip = () => {
@@ -72,6 +87,38 @@ function Checkout(props) {
 
   const handleReset = () => {
     setActiveStep(0);
+  };
+
+  const finishPayment = async () => {
+    if (deliveryAddress == null)
+      toast.error("Bạn chưa chọn địa chỉ giao hàng !");
+    if (paymentMethod === "CASH") {
+      const resPos = await fetch(`${NEXT_API}/api/checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // use the "body" param to optionally pass additional order information
+        // like product ids and quantities
+        body: JSON.stringify({
+          address_id: deliveryAddress.id,
+          method_payment: "CASH",
+        }),
+      });
+
+      const postData = await resPos.json();
+
+      if (!resPos.ok) {
+        toast.error("Lỗi, vui lòng thử lại ");
+      } else {
+        toast.success("Đặt hàng thành công !");
+        getCart();
+        router.push("/");
+      }
+    } else {
+      getCart();
+      router.push("/");
+    }
   };
 
   return (
@@ -124,9 +171,16 @@ function Checkout(props) {
               </Button>
             )}
 
-            <Button onClick={handleNext}>
+            {activeStep === steps.length - 1 && (
+              <Button onClick={finishPayment}>Finish</Button>
+            )}
+
+            {activeStep !== steps.length - 1 && (
+              <Button onClick={handleNext}>Next</Button>
+            )}
+            {/* <Button onClick={handleNext}>
               {activeStep === steps.length - 1 ? "Finish" : "Next"}
-            </Button>
+            </Button> */}
           </Box>
         </React.Fragment>
       )}

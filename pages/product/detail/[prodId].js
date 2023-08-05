@@ -13,6 +13,7 @@ import CartContext from "@/context/CartContext";
 import { AddCircleOutline, RemoveCircleOutline } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import { getAllProduct, getProductDetail } from "@/context/DataContext";
+import AuthContext from "@/context/AuthContext";
 const DynamicComponent = dynamic(
   () => import("../../../components/Slider/Slide"),
   {
@@ -34,6 +35,7 @@ const ProductDetail = ({ foundedProd }) => {
   const [quantity, setQuantity] = useState(1);
 
   const { addItemToCart } = useContext(CartContext);
+  const {user} = useContext(AuthContext);
 
   const syncActiveIndex = ({ e }) => {
     setActiveIndex(e);
@@ -52,10 +54,12 @@ const ProductDetail = ({ foundedProd }) => {
   });
 
   const addToCart = () => {
-    console.log(
-      "cart sent",
-      JSON.stringify({ productId: foundedProd.id, quantity: quantity })
-    );
+
+    console.log("User is " +user);
+    if(!user) {
+      toast.error("Vui lòng đăng nhập để mua sản phẩm");
+      return;
+    }
     addItemToCart({ productId: foundedProd.id, quantity: quantity });
   };
 
@@ -100,12 +104,12 @@ const ProductDetail = ({ foundedProd }) => {
           <div>
             <h2 className="font-bold font-md text-md mt-2">
               <span className="text-red-500">
-                {foundedProd.original_price -
-                  foundedProd.discount_percent * foundedProd.original_price}
+                {(foundedProd.original_price -
+                  foundedProd.discount_percent * foundedProd.original_price).toFixed(2)}
                 $
               </span>
               <span className="ml-4 text-gray-500 line-through">
-                {foundedProd.original_price}$
+                {(foundedProd.original_price).toFixed(2)}$
               </span>
               <button className="ml-4 text-gray-500 bg-black text-white px-2 py-1 rounded-md">
                 -{foundedProd.discount_percent}%
@@ -147,7 +151,7 @@ const ProductDetail = ({ foundedProd }) => {
           </div>
           <div className="flex mt-6">
             <button
-              className="text-lg border-2 border-solid border-black hover:bg-black hover:text-white px-10 rounded-lg font-md  py-2"
+              className="text-lg border-2 border-solid border-black hover:bg-black hover:text-white px-10 rounded-lg font-md  py-2" disabled={foundedProd.inStock? false: true}
               onClick={addToCart}
             >
               {" "}
