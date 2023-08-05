@@ -1,10 +1,77 @@
+import { NEXT_API } from "@/config";
+import CartContext from "@/context/CartContext";
+import { ExclamationCircleFilled } from "@ant-design/icons";
 import { AddCircleOutline, RemoveCircleOutline } from "@mui/icons-material";
-import { Badge } from "antd";
+import { Badge, Modal } from "antd";
 import Link from "next/link";
-import React from "react";
+import React, { useContext } from "react";
+import { toast } from "react-toastify";
 
 function CartItem({ data }) {
-  console.log("Cart item iss " + JSON.stringify(data));
+
+  const {getCart} = useContext(CartContext);
+
+  const { confirm } = Modal;
+
+  const showDeleteConfirm = (productId) => {
+    confirm({
+      title: 'Are you sure delete this cart item?',
+      icon: <ExclamationCircleFilled />,
+      content: 'Delete this cart item',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        const deleteCartItem = async () => {
+          const resDel = await fetch(
+            `${NEXT_API}/api/cart/${productId}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          const delData = await resDel.json();
+
+          if (!resDel.ok) {
+            toast.error(delData.message);
+          } else {
+            getCart();
+            toast.success("Xoá thành công");
+          }
+        };
+
+        deleteCartItem();
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
+
+
+
+  const updateQuantity = async (option, productId)  => {
+
+    const resPut = await fetch(`${NEXT_API}/api/cart`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({productId:productId, type: option })
+    });
+    const dataPut = await resPut.json();
+
+    if (!resPut.ok) {
+      toast.error("Lỗi cập nhật giỏ hàng");
+      
+    } else {
+      getCart();
+      toast.success("Đã cập nhật số lượng");
+    }
+
+
+  }
+  
   return (
     <div className="p-5 border shadow-lg rounded-md mt-2">
       <div className="flex">
@@ -35,7 +102,7 @@ function CartItem({ data }) {
             </p>
             <p className="opacity-50 line-through ">
               {" "}
-              {data.product.original_price} ${" "}
+              {(data.product.original_price).toFixed(2)} ${" "}
             </p>
 
             <Badge
@@ -47,15 +114,15 @@ function CartItem({ data }) {
         </div>
       </div>
       <div className="flex items-center space-x-4 mt-2">
-        <button>
+        <button onClick={() => updateQuantity("decrease", data.product.id)}>
           <RemoveCircleOutline />
         </button>
-        <span className="py-1 px-7 border rounded-sm">3</span>
-        <button>
+        <span className="py-1 px-7 border rounded-sm">{data.quantity}</span>
+        <button onClick={() => updateQuantity("increase", data.product.id)}>
           <AddCircleOutline />
         </button>
 
-        <button className="bg-black text-white px-2.5 py-1 rounded-md ml-4 hover:bg-red-400 hover:text-black">
+        <button className="bg-black text-white px-2.5 py-1 rounded-md ml-4 hover:bg-red-400 hover:text-black" onClick={() => showDeleteConfirm(data.product.id)} >
           Remove
         </button>
       </div>

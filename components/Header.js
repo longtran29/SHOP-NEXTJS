@@ -1,10 +1,10 @@
 import AuthContext from "@/context/AuthContext";
 import Link from "next/link";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Avatar from "@mui/material/Avatar";
-import logo from "../public/images/uniqlo_logo.png";
+import logo from "../public/images/logo1.png";
 import Image from "next/image";
 
 import { Fragment, useState } from "react";
@@ -23,68 +23,6 @@ import CartContext from "@/context/CartContext";
 
 const navigation = {
   categories: [
-    {
-      id: "women",
-      name: "Women",
-      featured: [
-        {
-          name: "New Arrivals",
-          href: "#",
-          imageSrc:
-            "https://tailwindui.com/img/ecommerce-images/mega-menu-category-01.jpg",
-          imageAlt:
-            "Models sitting back to back, wearing Basic Tee in black and bone.",
-        },
-        {
-          name: "Basic Tees",
-          href: "#",
-          imageSrc:
-            "https://tailwindui.com/img/ecommerce-images/mega-menu-category-02.jpg",
-          imageAlt:
-            "Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.",
-        },
-      ],
-      sections: [
-        {
-          id: "clothing",
-          name: "Clothing",
-          items: [
-            { name: "Tops", href: "#" },
-            { name: "Dresses", href: "#" },
-            { name: "Pants", href: "#" },
-            { name: "Denim", href: "#" },
-            { name: "Sweaters", href: "#" },
-            { name: "T-Shirts", href: "#" },
-            { name: "Jackets", href: "#" },
-            { name: "Activewear", href: "#" },
-            { name: "Browse All", href: "#" },
-          ],
-        },
-        {
-          id: "accessories",
-          name: "Accessories",
-          items: [
-            { name: "Watches", href: "#" },
-            { name: "Wallets", href: "#" },
-            { name: "Bags", href: "#" },
-            { name: "Sunglasses", href: "#" },
-            { name: "Hats", href: "#" },
-            { name: "Belts", href: "#" },
-          ],
-        },
-        {
-          id: "brands",
-          name: "Brands",
-          items: [
-            { name: "Full Nelson", href: "#" },
-            { name: "My Way", href: "#" },
-            { name: "Re-Arranged", href: "#" },
-            { name: "Counterfeit", href: "#" },
-            { name: "Significant Other", href: "#" },
-          ],
-        },
-      ],
-    },
     {
       id: "men",
       name: "Men",
@@ -160,7 +98,7 @@ export default function Header() {
 
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const {cart} = useContext(CartContext);
+  const { cart, getCart } = useContext(CartContext);
 
   const router = useRouter();
 
@@ -173,6 +111,14 @@ export default function Header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  console.log("User info is " , JSON.stringify(user ) , " user 1 ", user);
+
+  useEffect(() => {
+    if (user != null) {
+      getCart();
+    }
+  }, []);
 
   function DropdownItem(props) {
     return (
@@ -387,10 +333,10 @@ export default function Header() {
                 <Link href="/">
                   <span className="sr-only">Bamboo Shop</span>
                   <Image
-                    className="h-8 w-auto"
+                    className="h-8 w-auto cover"
                     src={logo}
-                    width={40}
-                    height={40}
+                    width={150}
+                    height={150}
                     alt=""
                   />
                 </Link>
@@ -580,19 +526,23 @@ export default function Header() {
                 </div>
 
                 {/* Cart */}
-                <div className="ml-4 flow-root lg:ml-6" onClick={() => router.push("/cart")}>
-                  <a href="#" className="group -m-2 flex items-center p-2">
-                    <ShoppingBagIcon
-                      className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                      aria-hidden="true"
-                      
-                    />
-                    <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                     {cart.length}
-                    </span>
-                    <span className="sr-only">items in cart, view bag</span>
-                  </a>
-                </div>
+                {user && (
+                  <div
+                    className="ml-4 flow-root lg:ml-6"
+                    onClick={() => router.push("/cart")}
+                  >
+                    <a href="#" className="group -m-2 flex items-center p-2">
+                      <ShoppingBagIcon
+                        className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+                        {cart.length}
+                      </span>
+                      <span className="sr-only">items in cart, view bag</span>
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>

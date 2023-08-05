@@ -1,39 +1,61 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { Grid, Box, Button, TextField } from "@mui/material";
 import AddressCard from "../AddressCard/AddressCard";
+import DataContext from "@/context/DataContext";
+import SpinTip from "../loading/SpinTip";
+import { useRouter } from "next/router";
+import AuthContext from "@/context/AuthContext";
 
 function DeliveryAddressForm(props) {
+  const { addNewAddress, userInfo, getUserInformation, isLoading } = useContext(DataContext);
+  const { user } = useContext(AuthContext);
+  const router = useRouter();
+  
+  useEffect(() => {
+    if(user) {
+      getUserInformation();
+    }
+  }, [user]);   // deps: handle khi context chưa kịp fetch, trigger changes
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const data = new FormData(e.target.value);
+    const data = new FormData(e.target); // get by e.target or e.currentTarget
 
-    const city = {
+    const address = {
       city: data.get("city"),
+      country: data.get("country"),
+      address: data.get("address"),
+      zipcode: data.get("zipcode"),
+      phoneNumber: data.get("phone"),
     };
 
-    console.log("City", city);
+    addNewAddress(address);
   };
   return (
     <div>
-      <Grid container spacing={2} className="mt-4">
+      {
+        userInfo != null && <>
+        {isLoading? <SpinTip /> : <Grid container spacing={2} className="mt-4">
         <Grid
-          itemm
+          item
           xs={12}
           sm={4}
           className="border rounded-e-md shadow-md overflow-y-scroll"
         >
           <div className="border-b cursor-pointer p-5 py-7">
-            <AddressCard />
-            <Button className="mt-5 bg-primary-600 text-white" type="button">
+            {
+              userInfo.addresses.map((address, index) => <AddressCard data={address} key={index} />)
+            }
+            <Button className="mt-5 bg-primary-600 text-white" type="button" onClick={() => router.push("/checkout?step=2")}>
               DELIVERY HERE
             </Button>
           </div>
         </Grid>
-        <Grid item xs={12} sm={7}>
+        <Grid item container xs={12} sm={7}>
           <Box className="border rounded-s-md shadow-md p-5">
             <form onSubmit={handleSubmit}>
-              <Grid container spacing={3}>
+              <Grid item container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     required
@@ -92,12 +114,14 @@ function DeliveryAddressForm(props) {
                 </Grid>
               </Grid>
               <Button className="mt-5 bg-primary-600 text-white" type="submit">
-                DELIVERY HERE
+                ADD ADDRESS
               </Button>
             </form>
           </Box>
         </Grid>
-      </Grid>
+      </Grid>}
+        </>
+      }
     </div>
   );
 }
