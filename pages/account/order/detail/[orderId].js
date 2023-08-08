@@ -4,8 +4,6 @@ import React from "react";
 import { API_URL, NEXT_API } from "@/config";
 import OrderAddressCard from "@/components/AddressCard/OrderAddressCard";
 import { Box, Button, Grid } from "@mui/material";
-import { deepPurple } from "@mui/material/colors";
-import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 
@@ -100,12 +98,8 @@ function OrderDetails({ orders }) {
               </div>
             </Grid>
             <Grid item>
-              <Box sx={{ color: deepPurple[500] }}>
-                <StarOutlineIcon
-                  sx={{ fontSize: "2rem" }}
-                  className="px-2 text-xl h-[2rem] w-[2rem] "
-                />
-                <span>Rate & Review Product</span>
+              <Box >
+              
               </Box>
             </Grid>
           </Grid>
