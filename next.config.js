@@ -6,6 +6,6 @@ const nextConfig = {
 module.exports = {
   reactStrictMode: false, 
   images: {
-    domains: ['res.cloudinary.com'],
+    domains: ['res.cloudinary.com', 'th.bing.com'],
   },
 }

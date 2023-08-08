@@ -10,7 +10,7 @@ function OrderSummary(props) {
   const { cart } = useContext(CartContext);
   const {deliveryAddress } = useContext(OrderContext);
   return (
-    <div>
+    <div className="p-10">
       <AddressCard data={deliveryAddress} />
 
       <div>
@@ -20,7 +20,7 @@ function OrderSummary(props) {
               <CartItem data={cartItem} />
             ))}
           </div>
-          <CartSummary />
+          <CartSummary option="checkout" />
         </div>
       </div>
     </div>

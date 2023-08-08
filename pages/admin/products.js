@@ -3,6 +3,7 @@ import DataContext from "@/context/DataContext";
 import { useFilterContext } from "@/context/FilterContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
+import { Chip } from "@mui/material";
 import { Image, Input, Modal, Spin, Switch, Table, Tag } from "antd";
 import { useRouter } from "next/router";
 import React, { Fragment, useContext, useState } from "react";
@@ -32,7 +33,7 @@ function Products(props) {
     category: null,
     productQuantity: 0,
   });
-  const [searchValue, setSearchValue] = ("")
+  const [searchValue, setSearchValue] = "";
 
   const { confirm } = Modal;
 
@@ -44,8 +45,8 @@ function Products(props) {
 
   const searchValueHandle = (value) => {
     setSearchValue(value);
-    updateFilterValue("text", value)
-  }
+    updateFilterValue("text", value);
+  };
 
   // update product
   const updateProduct = (productId) => {
@@ -122,10 +123,27 @@ function Products(props) {
       },
     },
     {
+      title: "Image",
+      dataIndex: "primaryImage",
+      key: "primaryImage",
+      responsive: ["lg"],
+      render: (imageUrl) => (
+        <Image alt={imageUrl} src={imageUrl} height={40} width={40} />
+      ),
+    },
+    {
       title: "Name",
       dataIndex: "name",
       key: "name",
       responsive: ["sm"],
+    },
+
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      responsive: ["lg"],
+      render: (_, record) => <h2>{record.category.name}</h2>,
     },
     {
       title: "Price",
@@ -147,23 +165,18 @@ function Products(props) {
         />
       ),
     },
+
     {
-      title: "Image",
-      dataIndex: "primaryImage",
-      key: "primaryImage",
+      title: "Stock",
+      dataIndex: "instock",
+      key: "instock",
       responsive: ["lg"],
-      render: (imageUrl) => (
-        <Image alt={imageUrl} src={imageUrl} height={40} width={40} />
-      ),
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-      responsive: ["lg"],
-      render:  (_, record) => (
-        <h2>{record.category.name}</h2>
-      ),
+      render: (_, record) =>
+        record.inStock ? (
+          <Chip label="Stock" color="primary" />
+        ) : (
+          <Chip label="Sold out" color="success" />
+        ),
     },
 
     {

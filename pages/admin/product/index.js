@@ -300,7 +300,7 @@ function AddProduct(props) {
                 </div>
               </div>
 
-              <div className="flex flex-col mt-6">
+              <div className="flex items-center mt-8">
                 <label className="font-semibold"> Primary Image </label>
                 <div className="flex align-center items-center mt-2">
                   <Image
@@ -469,18 +469,22 @@ function AddProduct(props) {
                   className="rounded-full"
                 />
 
-                <Input
-                  className="w-1/3 ml-8"
-                  tabIndex={"-1"}
-                  type="file"
-                  accept="image/png,image/jpg,image/jpeg"
-                  encType="multipart/form-data"
-                  multiple
-                  autoComplete="off"
-                  // style={{ display: "none" }}
-                  required={true}
-                  onChange={(e) => changeImage(e)}
-                />
+                <label className="border px-4 text-white py-2 bg-primary-500 font-semibold ml-12 rounded-md hover:bg-primary-600">
+                  Upload image
+                  <Input
+                    hidden
+                    className="w-1/3 ml-8"
+                    tabIndex={"-1"}
+                    type="file"
+                    accept="image/png,image/jpg,image/jpeg"
+                    encType="multipart/form-data"
+                    multiple
+                    autoComplete="off"
+                    // style={{ display: "none" }}
+                    required={true}
+                    onChange={(e) => changeImage(e)}
+                  />
+                </label>
               </div>
             </Col>
           </Row>
@@ -498,7 +502,7 @@ function AddProduct(props) {
           </Row>
 
           <div className="flex justify-center">
-          <button
+            <button
               className="bg-black text-white hover:bg-primary-700 font-semibold rounded-md px-4 py-2 mt-6 border border-1 border-solid rounded-md self-center mr-10"
               onClick={() => router.back()}
             >

@@ -482,18 +482,22 @@ function UpdateProduct(props) {
                   className="rounded-full"
                 />
 
-                <Input
-                  className="w-1/3 ml-8"
-                  tabIndex={"-1"}
-                  type="file"
-                  accept="image/png,image/jpg,image/jpeg"
-                  encType="multipart/form-data"
-                  multiple
-                  autoComplete="off"
-                  // style={{ display: "none" }}
-                  required={true}
-                  onChange={(e) => changeImage(e)}
-                />
+                <label  className="border px-4 text-white py-2 bg-primary-500 font-semibold ml-12 rounded-md hover:bg-primary-600">
+                  Upload image
+                  <Input
+                  hidden
+                    className="w-1/3 ml-8"
+                    tabIndex={"-1"}
+                    type="file"
+                    accept="image/png,image/jpg,image/jpeg"
+                    encType="multipart/form-data"
+                    multiple
+                    autoComplete="off"
+                    // style={{ display: "none" }}
+                    required={true}
+                    onChange={(e) => changeImage(e)}
+                  />
+                </label>
               </div>
             </Col>
           </Row>

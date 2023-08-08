@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [userOrder, setUserOrder] = useState([]);
 
   const router = useRouter();
 
@@ -23,6 +24,8 @@ export function AuthProvider({ children }) {
 
     if (!resGet.ok) {
     } else {
+      setUserOrder(dataGet.user.orders);
+      console.log("Order user are ", JSON.stringify(dataGet));
       const { user } = dataGet;
       setUser(user);
     }
@@ -48,7 +51,6 @@ export function AuthProvider({ children }) {
     console.log("Data user login " + JSON.stringify(data));
 
     if (response.ok) {
-      console.log("Da vao response ok " + data.user);
       setUser(data.user);
     } else {
       setError(data.message); // như phía trên đã setError(null) trước - bởi vì data.message value không đổi nên state này không được update và địa chỉ ô nhớ cũng k được update, do đó bên auth-form sẽ không cập nhật sự thay đổi -> useEffect của auth-form không được thực thi
@@ -71,7 +73,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, error, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, error, login, logout, isLoading, userOrder }}>
       {children}
     </AuthContext.Provider>
   );

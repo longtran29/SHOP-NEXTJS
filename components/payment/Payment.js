@@ -9,10 +9,13 @@ import { toast } from "react-toastify";
 // This value is from the props in the UI
 const style = { layout: "vertical" };
 
-async function createOrder(cart) {
-  console.log("Value cart in create order " , JSON.stringify(cart));
-  const totalCost = (cart.map((cartItem, index) => (cartItem.product.original_price)* (cartItem.quantity)).reduce((partialSum,a) => partialSum+a,0) + (cart.map((cartItem, index) => ((cartItem.product.discount_percent * cartItem.product.original_price))* (cartItem.quantity)).reduce((partialSum,a) => partialSum+a,0)) ).toFixed(2);
-  console.log("Total cost is " , totalCost + " and " + totalCost.toString());
+async function createOrder(cart, address) {
+  if(address == null) {
+    toast.error("Choose delivery address");
+    return;
+  }
+  
+  const totalCost = (cart.map((cartItem, index) => (cartItem.product.original_price - cartItem.product.original_price*cartItem.product.discount_percent)* (cartItem.quantity)).reduce((partialSum,a) => partialSum+a,0) + (cart.map((cartItem, index) => ((cartItem.product.discount_percent * cartItem.product.original_price))* (cartItem.quantity)).reduce((partialSum,a) => partialSum+a,0)) ).toFixed(2);
   const resPos = await fetch(`${NEXT_API}/api/checkout`, {
     method: "POST",
     headers: {
@@ -49,7 +52,7 @@ async function createOrder(cart) {
           },
         ],
       },
-      address_id: 1,
+      address_id: address.id,
       method_payment: "PAY_PAL",
     }),
   });
@@ -89,15 +92,16 @@ async function onApprove(data) {
 function Payment(props) {
 
   const [option, setOption] = useState();
-  const {setPaymentMethod} = useContext(OrderContext);
+  const {setPaymentMethod, deliveryAddress} = useContext(OrderContext);
   const {cart} = useContext(CartContext);
+  
 
   const paymentMethod = (e) => {
     console.log("Payment method " + e.target.value);
     setPaymentMethod(e.target.value);
   }
   return (
-    <div>
+    <div className="p-8">
       <div className="flex">
         {/* <input type="radio" name="optionPayment" value="PAY_PAL" onChange={paymentMethod} /> */}
         <PayPalButtons
@@ -105,7 +109,7 @@ function Payment(props) {
           disabled={false}
           forceReRender={[style]}
           fundingSource={undefined}
-          createOrder={() => createOrder(cart)}
+          createOrder={() => createOrder(cart, deliveryAddress)}
           onApprove={onApprove}
         />
       </div>
