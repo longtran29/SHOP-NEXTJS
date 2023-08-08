@@ -62,7 +62,7 @@ function CartItem({ data }) {
     const dataPut = await resPut.json();
 
     if (!resPut.ok) {
-      toast.error("Lỗi cập nhật giỏ hàng");
+      toast.error(dataPut.message);
       
     } else {
       getCart();

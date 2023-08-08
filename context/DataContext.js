@@ -12,8 +12,10 @@ export function DataProvider({ children }) {
   });
   const [error, setError] = useState("");
   const [userInfo, setUserInfo] = useState(null);
+  const [allUser, setAllUser] =  useState([]);
 
   useEffect(() => {
+    console.log("Da goi trong useEffect get brand");
     getBrands();
   }, []);
 
@@ -100,6 +102,7 @@ export function DataProvider({ children }) {
     if (!response.ok) {
       return data.message;
     } else {
+      console.log("User order are", JSON.stringify(data.user));
       setUserInfo(data.user);
     }
     setState((prevState) => ({ ...prevState, isLoading: false }));
@@ -141,6 +144,8 @@ export function DataProvider({ children }) {
     addNewAddress,
     userInfo: userInfo,
     getUserInformation,
+    allUser: allUser,
+    setAllUser
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

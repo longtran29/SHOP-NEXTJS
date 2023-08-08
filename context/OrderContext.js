@@ -8,9 +8,9 @@ export function OrderProvider({ children }) {
     isLoading: false,
   });
 
-  const [deliveryAddress, setDeliveryAddress] = useState();
+  const [deliveryAddress, setDeliveryAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState();
-
+  const [orderManagement, setOrderManagement] = useState([]);
 
   const deliverAddress = async () => {
     setState({ ...state, isLoading: true });
@@ -28,13 +28,28 @@ export function OrderProvider({ children }) {
     setState((prevState) => ({ ...prevState, isLoading: false }));
   };
 
+  const updateOrderManagement = async () => {
+    const resGet = await fetch(`${NEXT_API}/api/orders/manage`, {
+      method: "GET",
+    });
+
+    const dataGet = await resGet.json();
+
+    if (!resGet.ok) {
+      toast.error(dataGet.message);
+    } else {
+      setOrderManagement(dataGet.orders);   // cập nhật giá trị state vì địa chỉ của ô nhớ biến thay đổi
+    }
+  };
 
   const value = {
     setDeliveryAddress,
     deliveryAddress: deliveryAddress,
     setPaymentMethod,
-    paymentMethod
-
+    paymentMethod,
+    orderManagement: orderManagement ,
+    setOrderManagement,
+    updateOrderManagement
     
   };
 

@@ -6,25 +6,25 @@ import React from "react";
 function Order(props) {
   const orderStatus = [
     {
-      name: "On the way",
-      value: "new",
+      value: "NEW",
+      label: "new",
     },
     {
-      name: "Delivered",
-      value: "delivered",
+      value: "CONFIRMED",
+      label: "confirm",
     },
     {
-      name: "Rejected",
-      value: "rejected",
+      value: "SHIPPED",
+      label: "shipped",
     },
     {
-      name: "Canceled",
-      value: "canceled",
+      value: "ON_THE_WAY",
+      label: "on the way",
     },
     {
-      name: "Returned",
-      value: "return",
-    },
+      value: "DELIVERED",
+      label: "delivered",
+    }
   ];
 
   return (
@@ -51,11 +51,11 @@ function Order(props) {
           </div>
         </Grid>
 
-        <Grid item xs={10}>
+        {/* <Grid item xs={10}>
           {[1, 1, 1, 1, 1, 1].map((order) => (
             <OrderCard />
           ))}
-        </Grid>
+        </Grid> */}
       </Grid>
     </div>
   );

@@ -151,7 +151,7 @@ const ProductDetail = ({ foundedProd }) => {
           </div>
           <div className="flex mt-6">
             <button
-              className="text-lg border-2 border-solid border-black hover:bg-black hover:text-white px-10 rounded-lg font-md  py-2" disabled={foundedProd.inStock? false: true}
+              className="text-lg border-2 border-solid border-black hover:bg-black hover:text-white px-10 rounded-lg font-md  py-2"
               onClick={addToCart}
             >
               {" "}

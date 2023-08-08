@@ -582,10 +582,10 @@ export default function Header() {
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={() => router.push("/account")}>
             <Avatar /> Profile
           </MenuItem>
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={() => router.push("/account")}>
             <Avatar /> My account
           </MenuItem>
           <Divider />

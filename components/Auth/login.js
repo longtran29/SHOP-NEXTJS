@@ -1,11 +1,12 @@
 import { API_URL } from "@/config";
 import AuthContext from "@/context/AuthContext";
-import { LoadingOutlined } from "@ant-design/icons";
-import { Col, Row, Spin } from "antd";
+import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
+import { Col, Input, Modal, Row, Spin } from "antd";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SpinTip from "../loading/SpinTip";
 
 export default function Authenticate() {
   const [account, setAccount] = useState({
@@ -18,6 +19,29 @@ export default function Authenticate() {
   const { login, error, isLoading } = useContext(AuthContext);
   const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const checkUserEmail = async () => {
+    if (email == "") {
+      toast.error("Vui lòng nhập địa chỉ email");
+      return;
+    } else {
+      setLoading(true);
+      const resGet = await fetch(`${API_URL}/forgot_password/${email}`, {
+        method: "GET",
+      });
+
+      const dataGet = await resGet.json();
+
+      if (!resGet.ok) {
+        toast.error(dataGet.message);
+      } else {
+        toast.success("Check your link reset password in your email box");
+      }
+      setEmail("");
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // destroy error: must have bracket
@@ -25,6 +49,23 @@ export default function Authenticate() {
   }, [error]);
 
   const [register, setRegister] = useState(false);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [email, setEmail] = useState("");
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleOk = () => {
+    checkUserEmail();
+    setIsModalVisible(false);
+  };
+
   //
   const loginSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +74,7 @@ export default function Authenticate() {
         username: account.username,
         emai: account.email,
         rePassword: account.rePassword,
-        password: account.password
+        password: account.password,
       };
       // here we just get the response HTTP. use for check the status (.ok() method)
       const resPos = await fetch(`${API_URL}/auth/register`, {
@@ -53,11 +94,9 @@ export default function Authenticate() {
       } else {
         toast.success("Register successfully !");
       }
-
-      // router.push("/account/l")
       setRegister(false);
     } else {
-      console.log("vao login");
+      
       const payload = {
         username: account.username,
         password: account.password,
@@ -68,6 +107,8 @@ export default function Authenticate() {
 
   return (
     <>
+      {" "}
+      {loading ? <SpinTip /> : ""}
       {isLoading ? (
         <Spin
           indicator={antIcon}
@@ -75,7 +116,10 @@ export default function Authenticate() {
         />
       ) : (
         <Row>
-          <Col flex="800px" className="ml-8">
+          <Col
+            flex="800px"
+            className="ml-8 background-color background-image background-attachment background-size"
+          >
             <p className="mb-6 font-extralight text-4xl">
               {register ? "Register" : "Login"}
             </p>
@@ -154,10 +198,15 @@ export default function Authenticate() {
                   />
                 </div>
               )}
-              <p className="mt-4">Forgot your password</p>
+              <p
+                className="mt-4 hover:cursor-pointer hover:text-gray-600"
+                onClick={showModal}
+              >
+                Forgot your password
+              </p>
               <button
                 type="submit"
-                className="w-4/6 rounded-md border-2 border-black mt-4 border-solid p-2 hover:bg-black hover:text-white"
+                className="w-4/6 rounded-md border-2 border-black mt-4 border-solid p-2 hover:bg-black hover:text-white mb-4"
               >
                 {register ? "REGISTER" : "LOGIN"}
               </button>
@@ -181,6 +230,32 @@ export default function Authenticate() {
           </Col>
         </Row>
       )}
+      <Modal
+        title="Forgot password?"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={[
+          <button key="back" onClick={handleCancel}>
+            No
+          </button>,
+          <button
+            className="ml-4"
+            key="submit"
+            onClick={handleOk}
+            type="primary"
+          >
+            Yes
+          </button>,
+        ]}
+      >
+        <Input
+          className="border border-solid mt-4 p-4"
+          type="text"
+          placeholder="Enter registered email address"
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+        />
+      </Modal>
     </>
   );
 }

@@ -2,32 +2,39 @@ import React from "react";
 
 import { Grid } from "@mui/material";
 import AdjustIcon from "@mui/icons-material/Adjust";
+import Image from "next/image";
 function OrderCard(props) {
+
+  const {children, data} = props;
+
+  console.log("Data is " , JSON.stringify(data));
+
   return (
-    <div className="shadow-sm p-2 hover:shadow-2xl shadow-black mt-8">
-      <Grid container spacing={2}>
+    <div className="shadow-sm p-2 hover:shadow-2xl shadow-black">
+      <Grid container spacing={2} className="flex items-center">
         <Grid item xs={6}>
-          <div className="flex">
+          <div className="flex items-center">
             <div className="h-[5rem] w-[5rem]">
-              <img
+              <Image
                 className="object-cover cursor-pointer"
-                src="http://localhost:3000/_next/image?url=http%3A%2F%2Fres.cloudinary.com%2Fdhkf8una1%2Fimage%2Fupload%2Fv1690346948%2Fdg8aequmfx3dyfod2i7r.webp&w=640&q=75"
+                src={data.product.primaryImage} width={100} height={100}
               />
             </div>
-            <p className="text-sm font-semibold ml-8"> Dell 7559</p>
+            <h2 className="text-sm font-semibold ml-8">{data.product.name}</h2>
           </div>
         </Grid>
 
         <Grid item xs={2}>
-          <p>500 $</p>
+          <p className="text-black ">$ {(data.product.original_price - data.product.original_price * data.product.discount_percent).toFixed(2)}</p>
+          <p className="line-through text-green-600">$ {(data.product.original_price).toFixed(2)}</p>
         </Grid>
 
         <Grid item xs={4}>
           {true && (
             <div>
               <AdjustIcon className="text-green-600 mr-2 text-sm" />
-              <span>Delivered on March 3</span>
-              <p>Your item has been delivered</p>
+              <span>Delivered on {data.orderDate}</span>
+              <p>Your item has been deliver</p>
             </div>
           )}
 
