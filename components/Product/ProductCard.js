@@ -1,14 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 
 
 function ProductCard(props) {
   const { productDetails } = props;
 
+  const router = useRouter();
+
+
   return (
-    <div className="p-2 h-60 border-1 transition-all border-transparent border-solid bg-gray-50 rounded-md w-5/6">
-      <Link href={`/product/detail/${productDetails.id}`}>
+    <div className="p-2 h-60 border-1 transition-all border-transparent border-solid bg-gray-50 rounded-md w-5/6" onClick={() => router.push(`/product/detail/${productDetails.id}`)}>
+      
         <div className="rouned-md overflow-hidden h-40 ">
           <Image
             className="object-cover object-center w-full h-full block" alt={productDetails.name}
@@ -35,7 +39,6 @@ function ProductCard(props) {
           </div>
           <p className="font-bold text-xl text-indigo-500"></p>
         </div>
-      </Link>
     </div>
   );
 }
