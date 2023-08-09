@@ -44,15 +44,15 @@ function OrderDetails({ orders }) {
     <div className="p-8">
       <div>
         <h1 className="font-semibold text-xl">Delivery address</h1>
-        {/* <OrderAddressCard data={orders.address} /> */}
+        <OrderAddressCard data={orders.address} />
       </div>
 
       <div className="py-20">
         <Grid container className="flex items-center">
-          <Grid xs={10}>
-            {/* <OrderTracker activeStep={[steps[orders.orderStatus]]} /> */}
+          <Grid item xs={10}>
+            <OrderTracker activeStep={[steps[orders.orderStatus]]} />
           </Grid>
-          <Grid xs={2} className="">
+          <Grid xs={2} item className="">
             <button
               className="bg-primary-400 text-white px-3 py-2 rounded-sm hover:bg-primary-600"
               onClick={cancelOrder}
@@ -63,7 +63,7 @@ function OrderDetails({ orders }) {
         </Grid>
       </div>
       <Grid container>
-        {orders.orderDetails.map((detail) => (
+        {orders.orderDetails.map((detail, index) => (
           <Grid
             item
             container
@@ -71,6 +71,7 @@ function OrderDetails({ orders }) {
             display="flex"
             alignItems="center"
             justifyContent="space-between"
+            key={index}
           >
             <Grid item xs={6} className="flex">
               <div className="h-[5rem] w-[5rem] hover:cursor-pointer">
@@ -108,7 +109,6 @@ function OrderDetails({ orders }) {
     </div>
   );
 }
-
 export async function getServerSideProps(context) {
   const { params, req } = context;
   const { orderId } = params;
