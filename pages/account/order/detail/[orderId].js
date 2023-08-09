@@ -41,9 +41,7 @@ function OrderDetails({ orders }) {
   };
 
   return (
-    <div className="p-8">
-     <h2>Hello<h2>
-    </div>
+    <div>Hello</div>
   );
 }
 export async function getServerSideProps(context) {
