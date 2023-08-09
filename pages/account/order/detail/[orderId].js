@@ -6,6 +6,7 @@ import { API_URL, NEXT_API } from "@/config";
 // import { Box, Button, Grid } from "@mui/material";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
+import CustomerLayout from "@/layouts/CustomerLayout";
 
 function OrderDetails({ orders }) {
   const router = useRouter();
@@ -55,11 +56,11 @@ export async function getServerSideProps(context) {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  });
+  });n
 
   const orders = await response.json();
 
-  console.log("Order detail in get server ", JSON.stringify(orders));
+  console.log("Order detail in get server ", JSON.strigify(orders));
 
   return {
     props: {
