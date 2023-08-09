@@ -16,7 +16,7 @@ export default function HeaderStats(props) {
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
                   statSubtitle="Đơn hàng chờ xử lý"
-                  statTitle={data.pending}
+                  statTitle={data.pending ? data.pending : 0}
                   statArrow="up"
                   statPercent="0"
                   statPercentColor="text-emerald-500"
@@ -28,7 +28,7 @@ export default function HeaderStats(props) {
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
                   statSubtitle="Đơn hàng bị huỷ"
-                  statTitle={data.cancel}
+                  statTitle={data.cancel ? data.cancel : 0}
                   statArrow="down"
                   statPercent="0"
                   statPercentColor="text-red-500"
@@ -52,7 +52,7 @@ export default function HeaderStats(props) {
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
                   statSubtitle="Doanh thu tuần này"
-                  statTitle={(data.week).toFixed(2)}
+                  statTitle={data.week ? (data.week).toFixed(2) : 0}
                   statArrow="up"
                   statPercent="0"
                   statPercentColor="text-emerald-500"
