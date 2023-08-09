@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Avatar from "@mui/material/Avatar";
 import logo from "../public/images/logo1.png";
-import Image from "next/image";
+// import Image from "next/image";
 
 import { Fragment, useState } from "react";
 import { Dialog, Popover, Tab, Transition } from "@headlessui/react";
@@ -20,6 +20,7 @@ import { useRouter } from "next/router";
 import { Divider, ListItemIcon, Menu, MenuItem } from "@mui/material";
 import { Logout, PersonAdd } from "@mui/icons-material";
 import CartContext from "@/context/CartContext";
+import Image from "next/image";
 
 const navigation = {
   categories: [
@@ -493,7 +494,11 @@ export default function Header() {
                         aria-haspopup="true"
                         aria-expanded={open ? "true" : undefined}
                       >
-                        <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                        <Avatar sx={{ width: 32, height: 32 }}>
+
+                      <Image src={user.imgURL? user.imgURL : logo} width={60} height={60} />
+
+                        </Avatar>
                       </IconButton>
                     </Tooltip>
                   )}

@@ -40,7 +40,6 @@ function UserOrderCard(props) {
     DELIVERED: "5",
   };
 
-  
   const cancelOrder = async () => {
     const resPut = await fetch(
       `${NEXT_API}/api/user/order?action=cancel_order`,
@@ -58,14 +57,13 @@ function UserOrderCard(props) {
     if (!resPut.ok) {
       toast.error(putData.message);
     } else {
-      toast.success("Successfull");
+      toast.success("Cancel successfully !");
     }
   };
 
   return (
     <div
-      className="shadow-sm p-2 hover:shadow-2xl hover:cursor-pointer shadow-black mt-8"
-      // onClick={() => router.push(`/account/order/detail/${data.id}`)}
+      className="shadow-xs p-2 hover:shadow-sm hover:cursor-pointer shadow-black mt-8"
     >
       <Grid container spacing={2} className="flex items-center">
         <Grid item xs={6}>
@@ -139,6 +137,14 @@ function UserOrderCard(props) {
                   <div className="py-20">
                     <Grid container className="flex items-center">
                       <Grid xs={10}>
+                        <h2>
+                          <span className="font-semibold opacity-70">
+                            Payment status{" "}
+                          </span>{" "}
+                          {selectedOrder.methodPayment == "PAY_PAL"
+                            ? "Paid"
+                            : "Wait for paid"}
+                        </h2>
                         <OrderTracker
                           activeStep={[steps[selectedOrder.orderStatus]]}
                         />

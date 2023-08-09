@@ -5,13 +5,14 @@ import {
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FaUserTag } from "react-icons/fa";
 import { HiTemplate } from "react-icons/hi";
 import { BiSolidCategory, BiSolidReport } from "react-icons/bi";
 import { TbBrandEnvato } from "react-icons/tb";
 import { BsFillPostcardHeartFill } from "react-icons/bs";
 import { AiFillDashboard } from "react-icons/ai";
+import { GiBeachBag } from "react-icons/gi";
 
 import {
   BarChartOutlined,
@@ -23,9 +24,11 @@ import {
   SettingOutlined,
   TagsOutlined,
   TeamOutlined,
-  UploadOutlined
+  UploadOutlined,
 } from "@ant-design/icons";
-
+import AuthContext from "@/context/AuthContext";
+import Image from "next/image";
+import logo1 from "../public/images/logo1.png";
 
 const { Header, Sider, Content } = Layout;
 const AdminLayout = ({ children }) => {
@@ -35,23 +38,24 @@ const AdminLayout = ({ children }) => {
   } = theme.useToken();
 
   const menuItems = {
-    "/admin/dashboard": "1",
-    "/admin/products": "2",
-    "/admin/users": "3",
-    "/admin/categories": "4",
-    "/admin/brands": "5",
-    "/admin/orders": "6",
-    "/admin/blogs": "7",
-    "/admin/report": "8",
+    "/": "1",
+    "/admin/dashboard": "2",
+    "/admin/products": "3",
+    "/admin/users": "4",
+    "/admin/categories": "5",
+    "/admin/brands": "6",
+    "/admin/orders": "7",
+    "/admin/blogs": "8",
+    "/admin/report": "9",
   };
-  
-    const router = useRouter();
-  
-    const {pathname} = useRouter();
 
-  
+  const router = useRouter();
+
+  const { pathname } = useRouter();
+
   const [current, setCurrent] = useState([menuItems[pathname]]);
 
+  const { user, logout } = useContext(AuthContext);
 
   function getItem(label, key, icon, pathroute) {
     return {
@@ -62,29 +66,28 @@ const AdminLayout = ({ children }) => {
     };
   }
 
-  
-const countStyle = {
-  right: 24,
-};
-  
+  const countStyle = {
+    right: 24,
+  };
+
   const items = [
-    getItem("Dashboard", "1", <AiFillDashboard />, "/admin/dashboard"),
-    getItem("Products", "2", <HiTemplate />, "/admin/products"),
-    getItem("User", "3", <FaUserTag />, "/admin/users"),
-    getItem("Category", "4", <BiSolidCategory />, "/admin/categories"),
-    getItem("Brands", "5", <TbBrandEnvato />, "/admin/brands"),
-    getItem("Order", "6", <TbBrandEnvato />, "/admin/orders"),
-    getItem("Blogs", "7", <BsFillPostcardHeartFill />, "/admin/blogs"),
-    getItem("Thống kê", "8", <BiSolidReport />, "/admin/report"),
+    getItem("", "1", <Image src={logo1} width={80} height={80} className="object-cover cursor-pointer" />, "/"),
+    getItem("Dashboard", "2", <AiFillDashboard />, "/admin/dashboard"),
+    getItem("Products", "3", <HiTemplate />, "/admin/products"),
+    getItem("User", "4", <FaUserTag />, "/admin/users"),
+    getItem("Category", "5", <BiSolidCategory />, "/admin/categories"),
+    getItem("Brands", "6", <TbBrandEnvato />, "/admin/brands"),
+    getItem("Order", "7", <GiBeachBag />, "/admin/orders"),
+    getItem("Blogs", "8", <BsFillPostcardHeartFill />, "/admin/blogs"),
+    getItem("Thống kê", "9", <BiSolidReport />, "/admin/report"),
   ];
 
   const handleClick = ({ item, key }) => {
     setCurrent(key);
     router.push(item.props.pathroute);
   };
-  
-  return (
 
+  return (
     <Layout
       style={{
         minHeight: "100vh",
@@ -107,7 +110,9 @@ const countStyle = {
             padding: 0,
             background: colorBgContainer,
           }}
+          
         >
+          <div className="">
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -115,14 +120,17 @@ const countStyle = {
             style={{
               fontSize: "16px",
               width: 64,
-              height: 64,
+              // height: 64,
             }}
           />
+          <Button className="mr-0" onClick={logout}>Logout</Button>
+          </div>
         </Header>
+
         <Content
           style={{
-            margin: "24px 16px",
-            padding: 24,
+            margin: "0px 16px",
+            padding: 5,
             minHeight: 280,
             background: colorBgContainer,
           }}
