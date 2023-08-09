@@ -44,13 +44,13 @@ function OrderDetails({ orders }) {
     <div className="p-8">
       <div>
         <h1 className="font-semibold text-xl">Delivery address</h1>
-        <OrderAddressCard data={orders.address} />
+        {/* <OrderAddressCard data={orders.address} /> */}
       </div>
 
       <div className="py-20">
         <Grid container className="flex items-center">
           <Grid xs={10}>
-            <OrderTracker activeStep={[steps[orders.orderStatus]]} />
+            {/* <OrderTracker activeStep={[steps[orders.orderStatus]]} /> */}
           </Grid>
           <Grid xs={2} className="">
             <button
@@ -108,6 +108,7 @@ function OrderDetails({ orders }) {
     </div>
   );
 }
+
 export async function getServerSideProps(context) {
   const { params, req } = context;
   const { orderId } = params;
