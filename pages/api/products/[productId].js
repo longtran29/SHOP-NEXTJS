@@ -30,13 +30,12 @@ async function product(req, res) {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    const resDel = await postRes.json();
-
     if (!postRes.ok) {
-      res.status(500).json({ message: resDel.message });
+      const errorData = await postRes.json(); // Parse the error response as JSON
+      res.status(500).json({ message: errorData.message });
     } else {
-      res.status(200).json({ products: resDel });
+      const successMessage = await postRes.text();
+      res.status(200).json({ message: successMessage });
     }
   } else if (req.method === "PUT") {
     // if (req.body.status) {

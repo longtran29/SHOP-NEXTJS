@@ -14,12 +14,12 @@ async function categories(req, res) {
       },
     });
 
-    const dataDel = resDel.text();
-
     if (!resDel.ok) {
-      res.status(500).json({ message: dataDel.message });
+      const errorData = await resDel.json(); // Parse the error response as JSON
+      res.status(500).json({ message: errorData.message });
     } else {
-      res.status(200).json({ categories: dataDel });
+      const successMessage = await resDel.text();
+      res.status(200).json({ message: successMessage });
     }
   } else if (req.method === "PUT") {
     if (req.body.name) {

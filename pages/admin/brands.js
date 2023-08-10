@@ -58,22 +58,19 @@ function Brands(props) {
       okType: "danger",
       cancelText: "No",
       onOk() {
-        const deleteBrand = async () => {
+        (async () => {
           const response = await fetch(`${NEXT_API}/api/brands/${brandId}`, {
             method: "DELETE",
           });
-
-          const data = await response.json();
-
+        
           if (!response.ok) {
-            toast.error(data.message);
+            const errorData = await response.json(); // Parse the error response as JSON
+            toast.error(errorData.message);
           } else {
-            updateBrands(data.message);
+            getBrands();
             toast.success("Xoá thành công !");
           }
-        };
-
-        deleteBrand();
+        })();
       },
       onCancel() {},
     });

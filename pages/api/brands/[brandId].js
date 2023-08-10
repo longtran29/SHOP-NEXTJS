@@ -20,7 +20,6 @@ async function brand(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      
       res.status(500).json({ message: data.message });
     } else {
       res.status(200).json({ brands: data });
@@ -30,14 +29,16 @@ async function brand(req, res) {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     });
-    const data = response.text();
+
     if (!response.ok) {
-      res.status(500).json({ message: data.message });
+      const errorData = await response.json(); // Parse the error response as JSON
+      res.status(500).json({ message: errorData.message });
     } else {
-      res.status(200).json({ message: data });
+      const successMessage = await response.text();
+      res.status(200).json({ message: successMessage });
     }
   }
 }
