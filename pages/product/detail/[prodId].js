@@ -40,24 +40,24 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (prodId) {
-      // (async () => {
-      //   console.log("Da vao fetch prod detail ", prodId);
-      //   const resGet = await fetch(
-      //     `${NEXT_API}/api/products?action=get_detail&productId=${prodId}`,
-      //     {
-      //       method: "GET",
-      //     }
-      //   );
+      (async () => {
+        console.log("Da vao fetch prod detail ", prodId);
+        const resGet = await fetch(
+          `${NEXT_API}/api/products?action=get_detail&productId=${prodId}`,
+          {
+            method: "GET",
+          }
+        );
 
-      //   const dataGet = await resGet.json();
+        const dataGet = await resGet.json();
 
-      //   if (!resGet.ok) {
-      //     toast.error("Error" + dataGet.message);
-      //   } else {
-      //     console.log("prod fetched ", JSON.stringify(dataGet.productDetail));
-      //     setFoundedProd(dataGet.productDetail);
-      //   }
-      // })();
+        if (!resGet.ok) {
+          toast.error("Error" + dataGet.message);
+        } else {
+          console.log("prod fetched ", JSON.stringify(dataGet.productDetail));
+          setFoundedProd(dataGet.productDetail);
+        }
+      })();
     }
   }, [prodId]);
 
