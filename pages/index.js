@@ -17,8 +17,8 @@ function Home(props) {
 
   const responsive = {
     0: { items: 1 },
-    568: { items: 4 },
-    1024: { items: 6 },
+    568: { items: 2 },
+    1024: { items: 4 },
   };
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -39,9 +39,8 @@ function Home(props) {
     <div>
       <HomeCarousel />
 
-      {/* set parent relative - children absolute based on that - change margin parent will reflect */}
-      <div className="w-full mt-10 relative">
-        <p className="text-center mb-10">Products</p>
+      <div className="w-full mt-10 relative p-10">
+        <h2 className="text-center mb-10 font-semibold opacity-80">Products</h2>
 
         <div className="p-2 bg-white flex flex-row justify-center items-center border border-2 border-gray-100">
           {!isLoading ? (
@@ -59,15 +58,15 @@ function Home(props) {
             <SpinTip />
           )}
         </div>
-        {activeIndex < items.length - 6 && (
-          <div className="px-1 py-2.5 bg-gray-100 text-black absolute  top-40 right-2 hover:cursor-pointer">
+        {activeIndex < items.length - 4 && (
+          <div className="px-1 py-2.5 bg-primary-100 text-black absolute  top-60 right-4 hover:cursor-pointer">
             <KeyboardArrowRightIcon
               onClick={() => setActiveIndex(activeIndex + 1)}
             />
           </div>
         )}
         {activeIndex > 0 && (
-          <div className="px-1 py-2.5 bg-gray-100 text-black absolute  top-40 left-2 hover:cursor-pointer">
+          <div className="px-1 py-2.5 bg-primary-100 text-black absolute  top-60 left-4 hover:cursor-pointer">
             <KeyboardArrowLeftIcon
               onClick={() => setActiveIndex(activeIndex - 1)}
             />

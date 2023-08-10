@@ -37,26 +37,8 @@ async function product(req, res) {
       const successMessage = await postRes.text();
       res.status(200).json({ message: successMessage });
     }
-  } else if (req.method === "PUT") {
-    // if (req.body.status) {
-    //   const resPut = await fetch(`${API_URL}/products/status/${productId}`, {
-    //     method: "PUT",
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: req.body.status,
-    //   });
-
-    //   const dataPut = await resPut.json();
-
-    //   if (!resPut.ok) {
-    //     res.status(500).json({ message: dataPut.message });
-    //   } else {
-    //     res.status(200).json({ products: dataPut });
-    //   }
-    // } else
-
+  }
+  else if (req.method === "PUT") {
     {
       const data = await new Promise((resolve, reject) => {
         const form = formidable();

@@ -301,16 +301,16 @@ function AddProduct(props) {
               </div>
 
               <div className="flex items-center mt-8">
-                <label className="font-semibold"> Primary Image </label>
-                <div className="flex align-center items-center mt-2">
-                  <Image
-                    src={icon_upload}
-                    width={50}
-                    height={50}
-                    className="rounded-full"
-                  />
-
+                <Image
+                  src={icon_upload}
+                  width={50}
+                  height={50}
+                  className="rounded-full"
+                />
+                <label className="border px-4 text-white py-2 bg-primary-500 font-semibold ml-12 rounded-md hover:bg-primary-600">
+                  Upload primary image
                   <Input
+                    hidden
                     className="w-1/3 ml-8"
                     tabIndex={"-1"}
                     type="file"
@@ -322,7 +322,7 @@ function AddProduct(props) {
                     required={true}
                     onChange={(e) => setPrimaryImage(e)}
                   />
-                </div>
+                </label>
               </div>
             </Col>
           </Row>

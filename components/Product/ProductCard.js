@@ -3,19 +3,21 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 
-
 function ProductCard(props) {
   const { productDetails } = props;
 
   const router = useRouter();
 
-
   return (
-    <div className="p-2 h-60 border-1 transition-all border-transparent border-solid bg-gray-50 rounded-md w-5/6" onClick={() => router.push(`/product/detail/${productDetails.id}`)}>
-      
+    <div
+      className="p-2 h-60 border-1 transition-all border-transparent border-solid bg-gray-50 rounded-md w-5/6"
+      onClick={() => router.push(`/product/detail/${productDetails.id}`)}
+    >
+      <Link href={`/product/detail/${productDetails.id}`}>
         <div className="rouned-md overflow-hidden h-40 ">
           <Image
-            className="object-cover object-center w-full h-full block" alt={productDetails.name}
+            className="object-cover object-center w-full h-full block"
+            alt={productDetails.name}
             src={productDetails.primaryImage}
             width={400}
             height={400}
@@ -30,7 +32,11 @@ function ProductCard(props) {
               {productDetails.original_price}$
             </span>
             <span className="pt-1 text-xs text-gray-500 line-through ml-2 text-xl font-extralight text-gray-600">
-              {(productDetails.original_price - productDetails.original_price* productDetails.discount_percent).toFixed(2)}$
+              {(
+                productDetails.original_price -
+                productDetails.original_price * productDetails.discount_percent
+              ).toFixed(2)}
+              $
             </span>
 
             <span className="pt-1 text-xs text-gray-700 text-green-500 ml-2 font-bold text-xl">
@@ -39,6 +45,7 @@ function ProductCard(props) {
           </div>
           <p className="font-bold text-xl text-indigo-500"></p>
         </div>
+      </Link>
     </div>
   );
 }

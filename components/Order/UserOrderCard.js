@@ -63,7 +63,7 @@ function UserOrderCard(props) {
 
   return (
     <div
-      className="shadow-xs p-2 hover:shadow-sm hover:cursor-pointer shadow-black mt-8"
+      className="shadow-sm p-2 hover:shadow-sm hover:cursor-pointer shadow-black mt-8"
     >
       <Grid container spacing={2} className="flex items-center">
         <Grid item xs={6}>
@@ -137,12 +137,12 @@ function UserOrderCard(props) {
                   <div className="py-20">
                     <Grid container className="flex items-center">
                       <Grid xs={10}>
-                        <h2>
+                        <h2 className="mb-8">
                           <span className="font-semibold opacity-70">
                             Payment status{" "}
                           </span>{" "}
                           {selectedOrder.methodPayment == "PAY_PAL"
-                            ? "Paid"
+                            ? <span className="text-primary-400">Paid</span>
                             : "Wait for paid"}
                         </h2>
                         <OrderTracker
@@ -173,6 +173,7 @@ function UserOrderCard(props) {
                           <div className="h-[5rem] w-[5rem] hover:cursor-pointer">
                             <img src={detail.product.primaryImage} alt="" />
                           </div>
+                          
                           <div className="space-y-2 ml-5">
                             <p
                               className="hover:cursor-pointer font-semibold"

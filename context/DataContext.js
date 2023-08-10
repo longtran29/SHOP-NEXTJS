@@ -151,31 +151,4 @@ export function DataProvider({ children }) {
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }
 
-export const getProductDetail = async () => {
-  const postRes = await fetch(`http://192.168.1.113:3000/products/5`, {
-    method: "GET",
-  });
-
-  const resDel = await postRes.json();
-
-  if (!postRes.ok) {
-    res.status(500).json({ message: resDel.message });
-  } else {
-    return resDel;
-  }
-};
-export const getAllProduct = async () => {
-  const resGet = await fetch(`${API_URL}/products`, {
-    method: "GET",
-  });
-
-  const dataPos = await resGet.json();
-
-  if (!resGet.ok) {
-    console.log("Loi la ", JSON.stringify(dataPos));
-  } else {
-    return dataPos;
-  }
-};
-
 export default DataContext;

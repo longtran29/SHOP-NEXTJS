@@ -63,7 +63,30 @@ async function products(req, res) {
     } else {
       res.status(200).json({ products: dataPos });
     }
-  } else if (req.method == "GET") {
+  } 
+  
+  else if(req.method === "GET" && req.query.action == "get_detail") {
+
+  
+    const {productId} = req.query;
+
+    console.log("Da vao get detail " , productId);
+
+    const resGet = await fetch(`${API_URL}/products/${productId}`, {
+      method: "GET",
+    });
+  
+    const dataPos = await resGet.json();
+  
+    if (!resGet.ok) {
+      res.status(500).json({ message: dataPos.message });
+    } else {
+      console.log("Product detail is " , JSON.stringify(dataPos));
+      res.status(200).json({ productDetail: dataPos });
+    }
+  }
+
+  else if (req.method == "GET") {
     console.log("Da vao get trong api product");
     const resGet = await fetch(`${API_URL}/products`, {
       method: "GET",
