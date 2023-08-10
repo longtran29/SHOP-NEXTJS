@@ -15,7 +15,6 @@ export default function Auth() {
     } else {
       router.push("/");
     }
-    return null;
   }
 
   return (

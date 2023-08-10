@@ -10,18 +10,20 @@ function ProductCard(props) {
 
   return (
     <div
-      className="p-2 h-60 border-1 transition-all border-transparent border-solid bg-gray-50 rounded-md w-5/6"
+      className="overflow-hidden cursor-pointer flex flex-col items-center bg-white rounded-lg shadow-lg w-[15rem] mx-3 border border-black"
       onClick={() => router.push(`/product/detail/${productDetails.id}`)}
     >
       <Link href={`/product/detail/${productDetails.id}`}>
         <div className="rouned-md overflow-hidden h-40 ">
+          <div className="h-[13rem] w-[10rem]">
           <Image
-            className="object-cover object-center w-full h-full block"
+            className="object-cover object-top w-full h-full"
             alt={productDetails.name}
             src={productDetails.primaryImage}
             width={400}
             height={400}
           />
+          </div>
         </div>
         <div className="flex justify-between">
           <div className="flex-1 mr-3">

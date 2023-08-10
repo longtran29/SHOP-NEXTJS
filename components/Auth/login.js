@@ -16,7 +16,7 @@ export default function Authenticate() {
     rePassword: "",
   });
 
-  const { login, error, isLoading } = useContext(AuthContext);
+  const { login, error, isLoading, user } = useContext(AuthContext);
   const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -102,6 +102,8 @@ export default function Authenticate() {
         password: account.password,
       };
       login(payload);
+      if(user == "ADMIN") router.push("/admin/dashboard")
+      else router.push("/");
     }
   };
 

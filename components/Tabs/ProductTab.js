@@ -23,16 +23,15 @@ function ProductTab({ data }) {
           <TabList onChange={handleChange} aria-label="lab API tabs example">
             <Tab label="More information" value="information" />
             <Tab label="Reviews" value="review" />
-            <Tab label="Comments" value="comment" />
+
           </TabList>
         </Box>
         <TabPanel value="information">
           <ProductInfomation dataInfor = {data} />
         </TabPanel>
         <TabPanel value="review">
-          <ReviewProduct />
+          <ReviewProduct data= {data}/>
         </TabPanel>
-        <TabPanel value="comment">Comments</TabPanel>
       </TabContext>
     </Box>
   );

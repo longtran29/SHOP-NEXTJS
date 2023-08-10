@@ -15,12 +15,20 @@ import { toast } from "react-toastify";
 import { getAllProduct, getProductDetail } from "@/context/DataContext";
 import AuthContext from "@/context/AuthContext";
 import { useRouter } from "next/router";
+import { StarIcon } from "@heroicons/react/20/solid";
+import { RadioGroup } from "@headlessui/react";
 const DynamicComponent = dynamic(
   () => import("../../../components/Slider/Slide"),
   {
     ssr: false,
   }
 );
+
+const reviews = { href: "#", average: 4, totalCount: 117 };
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 const ProductDetail = () => {
   const router = useRouter();
@@ -32,24 +40,24 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (prodId) {
-      (async () => {
-        console.log("Da vao fetch prod detail ", prodId);
-        const resGet = await fetch(
-          `${NEXT_API}/api/products?action=get_detail&productId=${prodId}`,
-          {
-            method: "GET",
-          }
-        );
+      // (async () => {
+      //   console.log("Da vao fetch prod detail ", prodId);
+      //   const resGet = await fetch(
+      //     `${NEXT_API}/api/products?action=get_detail&productId=${prodId}`,
+      //     {
+      //       method: "GET",
+      //     }
+      //   );
 
-        const dataGet = await resGet.json();
+      //   const dataGet = await resGet.json();
 
-        if (!resGet.ok) {
-          toast.error("Error" + dataGet.message);
-        } else {
-          console.log("prod fetched ", JSON.stringify(dataGet.productDetail));
-          setFoundedProd(dataGet.productDetail);
-        }
-      })();
+      //   if (!resGet.ok) {
+      //     toast.error("Error" + dataGet.message);
+      //   } else {
+      //     console.log("prod fetched ", JSON.stringify(dataGet.productDetail));
+      //     setFoundedProd(dataGet.productDetail);
+      //   }
+      // })();
     }
   }, [prodId]);
 
@@ -96,11 +104,16 @@ const ProductDetail = () => {
     addItemToCart({ productId: foundedProd.id, quantity: quantity });
   };
 
+  const breadcrumbs = foundedProd && [
+    { id: 1, name: "Home", href: "/" },
+    { id: 2, name: foundedProd.category.name, href: "/shop" },
+  ];
+
   return (
     <div className="border-t-2 border-primary-200">
       {foundedProd ? (
         <>
-          <Breadcrumb
+          {/* <Breadcrumb
             className="p-2 border-1 border-solid bg-gray-100"
             items={[
               { href: "/", title: "Home" },
@@ -116,91 +129,212 @@ const ProductDetail = () => {
               },
             ]}
           />
+ */}
 
-          <Row className="mt-10 md:px-60 md:py-10 ">
-            <Col
-              flex={1}
-              className="hover:scale-125 transition-all duration-100 cursor-pointer"
-            >
-              <Image src={foundedProd.primaryImage} width={300} height={300} />
-            </Col>
-
-            <DynamicComponent foundedProd={foundedProd} />
-            <Col flex={3} className="ml-8">
-              <div className="font-bold font-fira">
-                <h2 className="text-4xl"> {foundedProd.name.toUpperCase()}</h2>
-              </div>
-              <div>
-                <h2 className="text-blue-500 text-xl font-extralight text-md mt-2">
-                  {foundedProd.category.name}
-                </h2>
-              </div>
-
-              <div>
-                <h2 className="font-bold font-md text-md mt-2">
-                  <span className="text-red-500">
-                    {(
-                      foundedProd.original_price -
-                      foundedProd.discount_percent * foundedProd.original_price
-                    ).toFixed(2)}
-                    $
-                  </span>
-                  <span className="ml-4 text-gray-500 line-through">
-                    {foundedProd.original_price.toFixed(2)}$
-                  </span>
-                  <button className="ml-4 text-gray-500 bg-black text-white px-2 py-1 rounded-md">
-                    -{foundedProd.discount_percent}%
-                  </button>
-                </h2>
-              </div>
-              <div className="font-extraligh text-lg mt-4 flex items-center">
-                <p className="block opacity-70">Available: </p>
-                <p className="text-green-600 ml-2">
-                  {" "}
-                  {foundedProd.inStock ? " In stock " : "Out of stock"}{" "}
-                </p>
-                <p className="text-green-600 ml-2">
-                  {foundedProd.inStock ? <CheckOutlined /> : <MinusOutlined />}
-                </p>
-              </div>
-              <div className="text-lg mt-4 flex items-center space-x-4 mt-2 opacity-70">
-                <p>Quantity :</p>
-
-                <button
-                  onClick={() => {
-                    quantity == 1
-                      ? toast.error("Chọn ít nhất 1 sản phẩm ")
-                      : setQuantity(quantity - 1);
-                  }}
+          <div className="bg-white">
+            <div className="pt-6">
+              <nav aria-label="Breadcrumb">
+                <ol
+                  role="list"
+                  className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8"
                 >
-                  <RemoveCircleOutline />
-                </button>
-                <span className="py-1 px-7 border rounded-sm">{quantity}</span>
-                <button
-                  onClick={() => {
-                    quantity == 5
-                      ? toast.error("Tối đa chọn 5 sản phẩm ")
-                      : setQuantity(quantity + 1);
-                  }}
-                >
-                  <AddCircleOutline />
-                </button>
-              </div>
-              <div className="flex mt-6">
-                <button
-                  className="text-lg border-2 border-solid border-black hover:bg-black hover:text-white px-10 rounded-lg font-md  py-2"
-                  onClick={addToCart}
-                >
-                  {" "}
-                  ADD TO CART
-                </button>
-                <button className="text-lg ml-4 border-2 border-solid border-black hover:bg-red-500 hover:text-white px-10 rounded-lg font-md  py-2">
-                  {" "}
-                  BUY NOW{" "}
-                </button>
-              </div>
-            </Col>
-          </Row>
+                  {breadcrumbs.map((breadcrumb) => (
+                    <li key={breadcrumb.id}>
+                      <div className="flex items-center">
+                        <a
+                          href={breadcrumb.href}
+                          className="mr-2 text-sm font-medium text-gray-900"
+                        >
+                          {breadcrumb.name}
+                        </a>
+                        <svg
+                          width={16}
+                          height={20}
+                          viewBox="0 0 16 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                          className="h-5 w-4 text-gray-300"
+                        >
+                          <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
+                        </svg>
+                      </div>
+                    </li>
+                  ))}
+                  <li className="text-sm">
+                    <a
+                      aria-current="page"
+                      className="font-medium text-gray-500 hover:text-gray-600"
+                    >
+                      {foundedProd.name}
+                    </a>
+                  </li>
+                </ol>
+              </nav>
+
+              <section className="grid gird-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 px-4 pt-10">
+                <div className="flex flex-col items-center">
+                  <div className="overflow-hidden rounded-lg max-w-[30rem] max-h-[35rem]">
+                    <Image
+                      src={foundedProd.primaryImage}
+                      width={300}
+                      height={300}
+                    />
+                  </div>
+                  <div className="flex space-x-5 flex-wrap justify-center">
+                    {foundedProd.images.map((image) => (
+                      <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg max-w-[10rem] max-h-[10rem] mt-4 ">
+                        <Image
+                          src={image.imageProduct}
+                          width={300}
+                          height={300}
+                          className="object-cover w-full h-full object-top"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Product info */}
+                <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-4xl lg:grid-cols-1 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16">
+                  <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
+                    <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                      {foundedProd.name}
+                    </h1>
+                  </div>
+
+                  {/* Options */}
+                  <div className="mt-4 lg:row-span-3 lg:mt-0">
+                    <h2 className="sr-only">Product information</h2>
+                    <p className="text-3xl tracking-tight text-gray-900">
+                      <h2 className="font-bold font-md text-md mt-2">
+                        <span className="text-red-500">
+                          {(
+                            foundedProd.original_price -
+                            foundedProd.discount_percent *
+                              foundedProd.original_price
+                          ).toFixed(2)}
+                          $
+                        </span>
+                        <span className="ml-4 text-gray-500 line-through">
+                          {foundedProd.original_price.toFixed(2)}$
+                        </span>
+                        <button className="ml-4 text-gray-500 bg-black text-white px-2 py-1 rounded-md">
+                          -{foundedProd.discount_percent}%
+                        </button>
+                      </h2>
+                    </p>
+                    <h2 className="text-blue-500 text-xl font-extralight text-md mt-2">
+                      {foundedProd.category.name}
+                    </h2>
+
+                    {/* Reviews */}
+                    <div className="mt-6">
+                      <h3 className="sr-only">Reviews</h3>
+                      <div className="flex items-center">
+                        <div className="flex items-center">
+                          {[0, 1, 2, 3, 4].map((rating) => (
+                            <StarIcon
+                              key={rating}
+                              className={classNames(
+                                reviews.average > rating
+                                  ? "text-gray-900"
+                                  : "text-gray-200",
+                                "h-5 w-5 flex-shrink-0"
+                              )}
+                              aria-hidden="true"
+                            />
+                          ))}
+                        </div>
+                        <p className="sr-only">
+                          {/* {reviews.average}  */}
+                          out of 5 stars
+                        </p>
+                        <a
+                          href={reviews.href}
+                          className="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                        >
+                          {reviews.totalCount} reviews
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="font-extraligh text-lg mt-4 flex items-center">
+                      <p className="block opacity-70">Available: </p>
+                      <p className="text-green-600 ml-2">
+                        {" "}
+                        {foundedProd.inStock
+                          ? " In stock "
+                          : "Out of stock"}{" "}
+                      </p>
+                      <p className="text-green-600 ml-2">
+                        {foundedProd.inStock ? (
+                          <CheckOutlined />
+                        ) : (
+                          <MinusOutlined />
+                        )}
+                      </p>
+                    </div>
+                    <div className="text-lg mt-4 flex items-center space-x-4 mt-2 opacity-70">
+                      <p>Quantity :</p>
+
+                      <button
+                        onClick={() => {
+                          quantity == 1
+                            ? toast.error("Chọn ít nhất 1 sản phẩm ")
+                            : setQuantity(quantity - 1);
+                        }}
+                      >
+                        <RemoveCircleOutline />
+                      </button>
+                      <span className="py-1 px-7 border rounded-sm">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => {
+                          quantity == 5
+                            ? toast.error("Tối đa chọn 5 sản phẩm ")
+                            : setQuantity(quantity + 1);
+                        }}
+                      >
+                        <AddCircleOutline />
+                      </button>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      onClick={addToCart}
+                    >
+                      Add to bag
+                    </button>
+                  </div>
+
+                  <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6">
+                    {/* Description and details */}
+                    <div>
+                      <h3 className="sr-only">Description</h3>
+
+                      <div className="space-y-6">
+                        <p className="text-base text-gray-900">
+                          {/* {product.description} */}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-10">
+                      <h2 className="text-sm font-medium text-gray-900">
+                        Details
+                      </h2>
+
+                      <div className="mt-4 space-y-6">
+                        {/* <p className="text-sm text-gray-600">{product.details}</p> */}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
 
           <div className="mt-10">
             <ProductTab data={foundedProd} />
