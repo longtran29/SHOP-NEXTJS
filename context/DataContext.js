@@ -28,15 +28,13 @@ export function DataProvider({ children }) {
   }, []);
 
   const getProducts = async () => {
-    console.log("Da vao get products");
+  
     setState((prevState) => ({ ...prevState, isLoading: true }));
     const response = await fetch(`${NEXT_API}/api/products`, {
       method: "GET",
     });
 
     const data = await response.json();
-
-    console.log("Ds products  " + JSON.stringify(data));
 
     if (!response.ok) {
       setError(data.message);
@@ -58,6 +56,7 @@ export function DataProvider({ children }) {
     if (!response.ok) {
       setError(data.message);
     } else {
+      console.log("Brand context ", JSON.stringify(data.brands));
       updateBrands(data.brands);
     }
     setState((prevState) => ({ ...prevState, isLoading: false }));

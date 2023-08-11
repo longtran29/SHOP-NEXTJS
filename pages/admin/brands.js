@@ -1,13 +1,13 @@
-import React, { Fragment, useContext, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import DataContext from "@/context/DataContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
 import { Input, Modal, Select, Spin, Table } from "antd";
 import { MdDeleteOutline } from "react-icons/md";
-import { RxUpdate } from "react-icons/rx";
 import { toast } from "react-toastify";
 import { NEXT_API } from "@/config";
-import brand from "../api/brands/[brandId]";
+import SpinTip from "@/components/loading/SpinTip";
+import { BiSolidEdit } from "react-icons/bi";
 
 function Brands(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,12 +31,30 @@ function Brands(props) {
 
   const Option = Select.Option;
 
+  const { Search } = Input;
+
+  const [showBrand, setShowBrand] = useState(listBrands);
+
+  const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {
+    if (searchValue) {
+      setShowBrand(
+        listBrands.filter((cate) =>
+          cate.name.toLowerCase().includes(searchValue)
+        )
+      );
+    } else setShowBrand(listBrands);
+  }, [searchValue, listBrands]);
+
   // update brand
   function updateBrand(brandId) {
     setIsModalOpen(true);
     setState({ ...state, isUpdating: true, updateBrandId: brandId });
 
     const foundBrand = listBrands.find((brand) => brand.id === brandId);
+
+    console.log("Brand found  ", JSON.stringify(foundBrand));
 
     setState((prevState) => ({
       ...prevState,
@@ -62,7 +80,7 @@ function Brands(props) {
           const response = await fetch(`${NEXT_API}/api/brands/${brandId}`, {
             method: "DELETE",
           });
-        
+
           if (!response.ok) {
             const errorData = await response.json(); // Parse the error response as JSON
             toast.error(errorData.message);
@@ -197,9 +215,9 @@ function Brands(props) {
       responsive: ["sm"],
       render: (_, record) => (
         <div className="flex items-center">
-          <RxUpdate
+          <BiSolidEdit
             onClick={() => updateBrand(record.id)}
-            className="hover:cursor-pointer hover:text-primary-700"
+            className="hover:cursor-pointer text-xl hover:text-primary-700"
           />
 
           <MdDeleteOutline
@@ -221,30 +239,45 @@ function Brands(props) {
       ) : (
         <div className="p-10">
           <div className="mb-4">
-            <button
-              className="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <svg
-                className="-ml-1 mr-2 h-6 w-6"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+            <div className="flex justify-between items-center">
+              <Search
+                placeholder="find your brand"
+                enterButton="Search"
+                size="large"
+                className="w-1/3"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+
+              <button
+                className="text-white bg-primary-500 hover:bg-pimary-600 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
+                onClick={() => setIsModalOpen(true)}
               >
-                <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path>
-              </svg>
-              Add brands
-            </button>
+                <svg
+                  className="-ml-1 mr-2 h-6 w-6 text-white"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path>
+                </svg>
+                Add brand
+              </button>
+            </div>
           </div>
-          <Table
-            columns={columns}
-            dataSource={listBrands}
-            pagination={{
-              pageSizeOptions: ["50", "100"],
-              showSizeChanger: true,
-              pageSize: 6,
-            }}
-            rowKey={(record) => record.id}
-          />
+          {showBrand && listCates ? (
+            <Table
+              columns={columns}
+              dataSource={showBrand}
+              pagination={{
+                pageSizeOptions: ["50", "100"],
+                showSizeChanger: true,
+                pageSize: 6,
+              }}
+              rowKey={(record) => record.id}
+            />
+          ) : (
+            <SpinTip />
+          )}
           <div>
             <Modal
               className="p-4 mt-20"

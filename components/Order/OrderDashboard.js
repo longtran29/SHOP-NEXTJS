@@ -1,5 +1,5 @@
 import { Box, Chip, Grid, Typography } from "@mui/material";
-import { Select, Switch, Table } from "antd";
+import { Select, Table } from "antd";
 import Image from "next/image";
 import React, { useContext, useState } from "react";
 import { MdDeleteOutline, MdEmail } from "react-icons/md";

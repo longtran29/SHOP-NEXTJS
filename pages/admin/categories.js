@@ -1,17 +1,14 @@
-import { API_URL, NEXT_API } from "@/config";
+import {  NEXT_API } from "@/config";
 import AdminLayout from "@/layouts/AdminLayout";
 import { Input, Modal, Switch, Table } from "antd";
 import Image from "next/image";
-import React, { useContext, useState } from "react";
-import { LoadingOutlined } from "@ant-design/icons";
-import { Spin } from "antd";
+import React, { useContext, useEffect, useState } from "react";
 import DataContext from "@/context/DataContext";
 import { MdDeleteOutline } from "react-icons/md";
-import { RxUpdate } from "react-icons/rx";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import SpinTip from "@/components/loading/SpinTip";
-import { handleImageUpload } from "@/utils/uploadImage";
+import { BiSolidEdit } from "react-icons/bi";
 
 function Categories(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,9 +28,25 @@ function Categories(props) {
 
   const { confirm } = Modal;
 
-  const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
+  const [loading, setLoading] = useState(false);
+
+  const [searchValue, setSearchValue] = useState("");
+
+  const [showCate, setShowCate] = useState(listCates);
+
+  const { Search } = Input;
 
   let imgUrl = "";
+
+  useEffect(() => {
+    if (searchValue) {
+      setShowCate(
+        listCates.filter((cate) =>
+          cate.name.toLowerCase().includes(searchValue)
+        )
+      );
+    } else setShowCate(listCates);
+  }, [searchValue, listCates]);
 
   // upload image handler
   const changeImage = (e) => {
@@ -80,6 +93,7 @@ function Categories(props) {
       toast.error(data.message);
     } else {
       updateCategories(data.categories);
+      status ? toast.info("Disabled") : toast.success("Enabled !");
     }
   };
 
@@ -130,6 +144,8 @@ function Categories(props) {
         return;
       }
 
+      setLoading(true);
+
       await handleImageUpload(state.imageData)
         .then((res) => {
           imgUrl = res;
@@ -161,6 +177,8 @@ function Categories(props) {
     } else {
       // cap nhat danh muc
       const categoryId = state.categoryId;
+
+      setLoading(true);
 
       if (state.imageData != null) {
         await handleImageUpload(state.imageData)
@@ -196,9 +214,11 @@ function Categories(props) {
         toast.error(resPutData.message);
         return;
       }
+      toast.success("Update successful !");
     }
-    
+
     getCategories();
+    setLoading(false);
     setIsModalOpen(false);
     setState({
       categoryName: "",
@@ -237,10 +257,24 @@ function Categories(props) {
       },
     },
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      responsive: ["sm"],
+      title: "Cate",
+      dataIndex: "imageUrl",
+      key: "imageUrl",
+      responsive: ["lg"],
+      render: (_, record) => (
+        <div className="flex">
+          <div className="h-[2rem] w-[2rem]">
+            <Image
+              alt={record.imageUrl}
+              src={record.imageUrl}
+              height={80}
+              width={80}
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <span className="ml-20">{record.name}</span>
+        </div>
+      ),
     },
     {
       title: "Enabled",
@@ -255,28 +289,19 @@ function Categories(props) {
         />
       ),
     },
-    {
-      title: "Image",
-      dataIndex: "imageUrl",
-      key: "imageUrl",
-      responsive: ["lg"],
-      render: (imageUrl) => (
-        <Image alt={imageUrl} src={imageUrl} height={40} width={40} />
-      ),
-    },
 
     {
       title: "Action",
       responsive: ["sm"],
       render: (_, record) => (
         <div className="flex items-center">
-          <RxUpdate
+          <BiSolidEdit
             onClick={() => updateCategory(record.id)}
-            className="hover:cursor-pointer hover:text-primary-700"
+            className="hover:cursor-pointer text-xl hover:text-primary-700"
           />
 
           <MdDeleteOutline
-            className="text-red-400 hover:fill-primary-700 text-xl ml-6 hover:cursor-pointer"
+            className="text-red-400 text-xl hover:fill-primary-700 ml-6 hover:cursor-pointer"
             onClick={() => deleteCategory(record.id)}
           />
         </div>
@@ -291,30 +316,45 @@ function Categories(props) {
       ) : (
         <div className="p-10">
           <div className="mb-4">
-            <button
-              className="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <svg
-                className="-ml-1 mr-2 h-6 w-6"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+            <div className="flex justify-between items-center">
+              <Search
+                placeholder="find your category"
+                enterButton="Search"
+                size="large"
+                className="w-1/3"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+
+              <button
+                className="text-white bg-primary-500 hover:bg-pimary-600 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
+                onClick={() => setIsModalOpen(true)}
               >
-                <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path>
-              </svg>
-              Add category
-            </button>
+                <svg
+                  className="-ml-1 mr-2 h-6 w-6 text-white"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path>
+                </svg>
+                Add category
+              </button>
+            </div>
           </div>
-          <Table
-            columns={columns}
-            dataSource={listCates}
-            pagination={{
-              pageSizeOptions: ["50", "100"],
-              showSizeChanger: true,
-              pageSize: 6,
-            }}
-            rowKey={(record) => record.id}
-          />
+          {showCate ? (
+            <Table
+              columns={columns}
+              dataSource={showCate}
+              pagination={{
+                pageSizeOptions: ["50", "100"],
+                showSizeChanger: true,
+                pageSize: 6,
+              }}
+              rowKey={(record) => record.id}
+            />
+          ) : (
+            <SpinTip />
+          )}
           <div>
             <Modal
               className="p-4 mt-20"
@@ -363,6 +403,7 @@ function Categories(props) {
           </div>
         </div>
       )}
+      {loading ? <SpinTip /> : ""}
     </>
   );
 }

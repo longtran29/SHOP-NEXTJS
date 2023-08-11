@@ -102,8 +102,6 @@ export default function Authenticate() {
         password: account.password,
       };
       login(payload);
-      if(user == "ADMIN") router.push("/admin/dashboard")
-      else router.push("/");
     }
   };
 

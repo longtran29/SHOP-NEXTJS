@@ -590,9 +590,6 @@ export default function Header() {
           <MenuItem onClick={() => router.push("/account")}>
             <Avatar /> Profile
           </MenuItem>
-          <MenuItem onClick={() => router.push("/account")}>
-            <Avatar /> My account
-          </MenuItem>
           <Divider />
 
           <MenuItem onClick={logout}>

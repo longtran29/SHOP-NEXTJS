@@ -1,7 +1,7 @@
 import Authenticate from "@/components/Auth/login";
 import AuthContext from "@/context/AuthContext";
 import { useRouter } from "next/router";
-import { Fragment, useContext } from "react";
+import { Fragment, useContext, useEffect } from "react";
 import CustomerLayout from "@/layouts/CustomerLayout";
 
 export default function Auth() {
@@ -9,13 +9,11 @@ export default function Auth() {
 
   const router = useRouter();
 
-  if (user) {
-    if (user === "ADMIN") {
-      router.push("/admin/dashboard");
-    } else {
-      router.push("/");
+  useEffect(() => {
+    if (user) {
+      user.role == "ADMIN" ? router.push("/admin/dashboard") : router.push("/");
     }
-  }
+  }, [user]);
 
   return (
     <>

@@ -1,3 +1,4 @@
+import SpinTip from "@/components/loading/SpinTip";
 import { NEXT_API } from "@/config";
 import DataContext from "@/context/DataContext";
 import { useFilterContext } from "@/context/FilterContext";
@@ -6,14 +7,15 @@ import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
 import { Chip } from "@mui/material";
 import { Image, Input, Modal, Spin, Switch, Table, Tag } from "antd";
 import { useRouter } from "next/router";
-import React, { Fragment, useContext, useState } from "react";
+import React, { Fragment, useContext, useState, useEffect } from "react";
+import { BiSolidEdit } from "react-icons/bi";
 import { MdDeleteOutline } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
 import { toast } from "react-toastify";
 
 function Products(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { getProducts } = useContext(DataContext);
+  const { getProducts, listProds } = useContext(DataContext);
   const { filter_products, updateFilterValue } = useFilterContext();
   const [state, setState] = useState({
     imagePreview: "",
@@ -33,7 +35,6 @@ function Products(props) {
     category: null,
     productQuantity: 0,
   });
-  const [searchValue, setSearchValue] = "";
 
   const { confirm } = Modal;
 
@@ -41,12 +42,22 @@ function Products(props) {
 
   const Search = Input.Search;
 
-  const router = useRouter();
+  const [showProduct, setShowProduct] = useState(listProds);
 
-  const searchValueHandle = (value) => {
-    setSearchValue(value);
-    updateFilterValue("text", value);
-  };
+  const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {
+    if (searchValue) {
+      setShowProduct(
+        listProds.filter((cate) =>
+          cate.name.toLowerCase().includes(searchValue)
+        )
+      );
+    } else setShowProduct(listProds);
+  }, [searchValue, listProds]);
+
+
+  const router = useRouter();
 
   // update product
   const updateProduct = (productId) => {
@@ -184,13 +195,11 @@ function Products(props) {
       responsive: ["sm"],
       render: (_, record) => (
         <div className="flex items-center">
-          <RxUpdate
-            onClick={() => updateProduct(record.id)}
-            className="hover:cursor-pointer hover:text-primary-700"
-          />
+          <BiSolidEdit onClick={() => updateProduct(record.id)}
+            className="hover:cursor-pointer text-xl hover:text-red-700" />
 
           <MdDeleteOutline
-            className="text-red-400 hover:fill-primary-700 text-xl ml-6 hover:cursor-pointer"
+            className="text-red-400 hover:text-blue-700 text-xl ml-6 hover:cursor-pointer"
             onClick={() => deleteProduct(record.id)}
           />
         </div>
@@ -207,22 +216,24 @@ function Products(props) {
         />
       ) : (
         <div className="p-10">
+        
           <div className="mb-4">
             <div className="flex justify-between items-center">
               <Search
-                className="w-1/3 p-2"
-                placeholder="Search product name"
-                onSearch={(value) => updateFilterValue("text", value)}
-                enterButton
+                placeholder="find your product"
+                enterButton="Search"
+                size="large"
+                className="w-1/3"
                 value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
               />
 
               <button
-                className="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
+                className="text-white bg-primary-500 hover:bg-pimary-600 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
                 onClick={() => router.push("/admin/product")}
               >
                 <svg
-                  className="-ml-1 mr-2 h-6 w-6"
+                  className="-ml-1 mr-2 h-6 w-6 text-white"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
                 >
@@ -232,16 +243,18 @@ function Products(props) {
               </button>
             </div>
           </div>
-          <Table
-            columns={columns}
-            dataSource={filter_products}
-            pagination={{
-              pageSizeOptions: ["50", "100"],
-              showSizeChanger: true,
-              pageSize: 6,
-            }}
-            rowKey={(record) => record.id}
-          />
+         {
+          showProduct ?  <Table
+          columns={columns}
+          dataSource={showProduct}
+          pagination={{
+            pageSizeOptions: ["50", "100"],
+            showSizeChanger: true,
+            pageSize: 6,
+          }}
+          rowKey={(record) => record.id}
+        /> : <SpinTip />
+         }
         </div>
       )}
     </Fragment>

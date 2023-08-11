@@ -1,6 +1,7 @@
 import { NEXT_API } from "@/config";
 import { useRouter } from "next/router";
 import { createContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 
@@ -12,24 +13,24 @@ export function AuthProvider({ children }) {
 
   const router = useRouter();
 
-  useEffect(() => {
-    checkHasLogged();
-  }, []);
+  // useEffect(() => {
+  //   checkHasLogged();
+  // }, []);
 
-  const checkHasLogged = async () => {
-    const resGet = await fetch(`${NEXT_API}/api/users`, {
-      method: "GET",
-    });
-    const dataGet = await resGet.json();
+  // const checkHasLogged = async () => {
+  //   const resGet = await fetch(`${NEXT_API}/api/users`, {
+  //     method: "GET",
+  //   });
+  //   const dataGet = await resGet.json();
 
-    if (!resGet.ok) {
-    } else {
-      setUserOrder(dataGet.user.orders);
-      console.log("Order user are ", JSON.stringify(dataGet));
-      const { user } = dataGet;
-      setUser(user);
-    }
-  };
+  //   if (!resGet.ok) {
+  //   } else {
+  //     setUserOrder(dataGet.user.orders);
+  //     console.log("Order user are ", JSON.stringify(dataGet));
+  //     const { user } = dataGet;
+  //     setUser(user);
+  //   }
+  // };
 
   // login user
   const login = async ({ username, password }) => {
@@ -51,15 +52,10 @@ export function AuthProvider({ children }) {
     console.log("Data user login " + JSON.stringify(data));
 
     if (response.ok) {
-      setUser(data.user);
-      console.log("Da qua chuan bi vao admin");
-      if (data.user === "ADMIN") {
-        console.log("Value 1 la ", data.user);
-        router.push("/admin/dashboard");
-      }
-      else router.push("/");
+      setUser({role: data.user});
+      toast.success("Login succesfull")
     } else {
-      setError(data.message); // như phía trên đã setError(null) trước - bởi vì data.message value không đổi nên state này không được update và địa chỉ ô nhớ cũng k được update, do đó bên auth-form sẽ không cập nhật sự thay đổi -> useEffect của auth-form không được thực thi
+      toast.error(data.message);
     }
     setIsLoading(false);
   };

@@ -12,7 +12,7 @@ function Shopping(props) {
   return (
     <Fragment>
       {filter_products && (
-        <Row>
+        <Row className="p-12">
           <Col flex="400px" className="pl-4">
             <FilterSection />
           </Col>

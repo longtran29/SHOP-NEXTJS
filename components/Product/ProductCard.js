@@ -10,22 +10,22 @@ function ProductCard(props) {
 
   return (
     <div
-      className="overflow-hidden cursor-pointer flex flex-col items-center bg-white rounded-lg shadow-lg w-[15rem] mx-3 border border-black"
+      className="overflow-hidden cursor-pointer flex flex-col items-center  bg-gray-100 rounded-lg shadow-lg w-[15rem] mx-3 border border-black"
       onClick={() => router.push(`/product/detail/${productDetails.id}`)}
     >
       <Link href={`/product/detail/${productDetails.id}`}>
-        <div className="rouned-md overflow-hidden h-40 ">
-          <div className="h-[13rem] w-[10rem]">
+        <div className="rouned-md overflow-hidden">
+          <div className="h-[13rem] w-full">
           <Image
-            className="object-cover object-top w-full h-full"
+            className="object-cover w-full h-auto"
             alt={productDetails.name}
             src={productDetails.primaryImage}
-            width={400}
-            height={400}
+            width={200}
+            height={200}
           />
           </div>
         </div>
-        <div className="flex justify-between">
+        <div className="flex justify-between m-4">
           <div className="flex-1 mr-3">
             <h2 className="text-gray-900 title-font text-md font-bold capitalize">
               {productDetails.name}

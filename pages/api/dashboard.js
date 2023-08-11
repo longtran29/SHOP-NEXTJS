@@ -6,6 +6,7 @@ async function categories(req, res) {
 
   switch (req.method) {
     case "GET":
+      console.log("Da vao get dashboard");
       const response = await fetch(`${API_URL}/admin/dashboard`, {
         method: "GET",
         headers: {
@@ -15,7 +16,7 @@ async function categories(req, res) {
 
       const restData = await response.json();
       if (!response.ok) {
-        console.log("error" , JSON.stringify(restData));
+        console.log("error in dash" , JSON.stringify(restData));
       } else {
         console.log("val dashboard ", JSON.stringify(restData));
         res.status(200).json({ dashboard : restData });

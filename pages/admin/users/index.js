@@ -1,15 +1,12 @@
 import SpinTip from "@/components/loading/SpinTip";
 import { NEXT_API } from "@/config";
 import DataContext from "@/context/DataContext";
-import { useFilterContext } from "@/context/FilterContext";
 import AdminLayout from "@/layouts/AdminLayout";
-import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
+import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Chip } from "@mui/material";
-import { Image, Input, Modal, Spin, Switch, Table, Tag } from "antd";
-import { useRouter } from "next/router";
+import { Image, Input, Modal, Switch, Table, Tag } from "antd";
 import React, { Fragment, useContext, useEffect, useState } from "react";
-import { MdDeleteOutline } from "react-icons/md";
-import { RxUpdate } from "react-icons/rx";
+import { BiSolidEdit } from "react-icons/bi";
 import { toast } from "react-toastify";
 
 function Products(props) {
@@ -18,7 +15,25 @@ function Products(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [updateUser, setUpdateUser] = useState(null);
   const [update, setUpdate] = useState(false);
-  const { confirm } = Modal;
+
+  const [searchValue, setSearchValue] = useState("");
+
+  const [showUsers, setShowUsers] = useState(allUser);
+
+  const { Search } = Input;
+
+  useEffect(() => {
+    if (searchValue) {
+      setShowUsers(
+        allUser.filter(
+          (cate) =>
+            cate.email.toLowerCase().includes(searchValue) ||
+            cate.name.toLowerCase().includes(searchValue) ||
+            cate.phoneNumber.toLowerCase().includes(searchValue)
+        )
+      );
+    } else setShowUsers(allUser);
+  }, [searchValue, allUser]);
 
   const showConfirm = () => {
     confirm({
@@ -69,7 +84,11 @@ function Products(props) {
           <Image
             className="rounded-full border border-white border-solid"
             alt="avatar"
-            src={record.imgURL}
+            src={
+              record.imgURL
+                ? record.imgURL
+                : "https://th.bing.com/th/id/OIP.srdjU7JjdeYDjK46AQVGKwHaHa?pid=ImgDet&w=200&h=200&c=7&dpr=1.3"
+            }
             height={40}
             width={40}
           />
@@ -105,23 +124,26 @@ function Products(props) {
             // setUpdateUser(record)
 
             (async () => {
-              const resGet = await fetch(`${NEXT_API}/api/user?action=update_status`, {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  customerId: record.id,
-                  status: record.enabled ? "disabled" : "enabled",
-                }),
-              });
+              const resGet = await fetch(
+                `${NEXT_API}/api/user?action=update_status`,
+                {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    customerId: record.id,
+                    status: record.enabled ? "disabled" : "enabled",
+                  }),
+                }
+              );
 
               const dataGet = await resGet.json();
 
               if (!resGet.ok) {
                 toast.error(dataGet.message);
               } else {
-                if(record.enabled) toast.error("Deactive account !");
+                if (record.enabled) toast.error("Deactive account !");
                 else toast.success("Active account!");
                 setUpdate(!update);
               }
@@ -137,11 +159,11 @@ function Products(props) {
       key: "role",
       responsive: ["lg"],
       render: (_, record) =>
-        record.roles.map((role) =>
+        record.roles.map((role, index) =>
           role.name == "ROLE_ADMIN" ? (
-            <Chip label={role.name} color="success" />
+            <Chip label={role.name} color="success" key={index} />
           ) : (
-            <Chip label={role.name} color="primary" />
+            <Chip label={role.name} color="primary" key={index} />
           )
         ),
     },
@@ -151,14 +173,9 @@ function Products(props) {
       responsive: ["sm"],
       render: (_, record) => (
         <div className="flex items-center">
-          <RxUpdate
-            // onClick={() => updateProduct(record.id)}
-            className="hover:cursor-pointer hover:text-primary-700"
-          />
-
-          <MdDeleteOutline
-            className="text-red-400 hover:fill-primary-700 text-xl ml-6 hover:cursor-pointer"
-            // onClick={() => deleteProduct(record.id)}
+          <BiSolidEdit
+            // onClick={() => updateCategory(record.id)}
+            className="hover:cursor-pointer text-xl hover:text-primary-700"
           />
         </div>
       ),
@@ -168,25 +185,47 @@ function Products(props) {
   return (
     <Fragment>
       {isLoading ? (
-        <SpinTip
-
-        // className="flex justify-center align-center items-center w-screen h-screen"
-        />
+        <SpinTip />
       ) : (
         <div className="p-10">
           <div className="mb-4">
-            <div className="flex justify-between items-center"></div>
+            <div className="flex justify-between items-center">
+              <Search
+                placeholder="search email / phone number / name"
+                enterButton="Search"
+                size="large"
+                className="w-1/3"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+
+              <button className="text-white bg-primary-500 hover:bg-pimary-600 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto">
+                <svg
+                  className="-ml-1 mr-2 h-6 w-6 text-white"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path>
+                </svg>
+                Add user
+              </button>
+            </div>
           </div>
-          <Table
-            columns={columns}
-            dataSource={allUser}
-            pagination={{
-              pageSizeOptions: ["50", "100"],
-              showSizeChanger: true,
-              pageSize: 6,
-            }}
-            rowKey={(record) => record.id}
-          />
+
+          {showUsers ? (
+            <Table
+              columns={columns}
+              dataSource={showUsers}
+              pagination={{
+                pageSizeOptions: ["50", "100"],
+                showSizeChanger: true,
+                pageSize: 6,
+              }}
+              rowKey={(record) => record.id}
+            />
+          ) : (
+            <SpinTip />
+          )}
         </div>
       )}
     </Fragment>
