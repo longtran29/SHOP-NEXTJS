@@ -13,24 +13,25 @@ export function AuthProvider({ children }) {
 
   const router = useRouter();
 
-  // useEffect(() => {
-  //   checkHasLogged();
-  // }, []);
+  useEffect(() => {
+    checkHasLogged();
+  }, []);
 
-  // const checkHasLogged = async () => {
-  //   const resGet = await fetch(`${NEXT_API}/api/users`, {
-  //     method: "GET",
-  //   });
-  //   const dataGet = await resGet.json();
+  const checkHasLogged = async () => {
+    const resGet = await fetch(`${NEXT_API}/api/users`, {
+      method: "GET",
+    });
+    const dataGet = await resGet.json();
 
-  //   if (!resGet.ok) {
-  //   } else {
-  //     setUserOrder(dataGet.user.orders);
-  //     console.log("Order user are ", JSON.stringify(dataGet));
-  //     const { user } = dataGet;
-  //     setUser(user);
-  //   }
-  // };
+    if (!resGet.ok) {
+    } else {
+      setUserOrder(dataGet.user.orders);
+      console.log("Order user are ", JSON.stringify(dataGet));
+      setUser({role: dataGet.user.roles.map(role  => role.name)});
+
+      
+    }
+  };
 
   // login user
   const login = async ({ username, password }) => {
