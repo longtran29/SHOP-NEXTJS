@@ -15,10 +15,9 @@ import {
   ShoppingBagIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import { Divider, ListItemIcon, Menu, MenuItem } from "@mui/material";
-import { Logout, PersonAdd } from "@mui/icons-material";
+import { Logout } from "@mui/icons-material";
 import CartContext from "@/context/CartContext";
 import Image from "next/image";
 

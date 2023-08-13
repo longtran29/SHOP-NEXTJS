@@ -2,12 +2,14 @@ import React, { Fragment, useContext, useEffect, useState } from "react";
 import DataContext from "@/context/DataContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
-import { Input, Modal, Select, Spin, Table } from "antd";
+import { Badge, Input, Modal, Select, Spin, Table } from "antd";
 import { MdDeleteOutline } from "react-icons/md";
 import { toast } from "react-toastify";
 import { NEXT_API } from "@/config";
 import SpinTip from "@/components/loading/SpinTip";
 import { BiSolidEdit } from "react-icons/bi";
+import { Button, IconButton } from "@mui/material";
+import Image from "next/image";
 
 function Brands(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,8 +24,7 @@ function Brands(props) {
 
   const { value } = state;
 
-  const { listBrands, listCates, getBrands } =
-    useContext(DataContext);
+  const { listBrands, listCates, getBrands } = useContext(DataContext);
 
   const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
 
@@ -52,7 +53,8 @@ function Brands(props) {
     setIsModalOpen(true);
     setState({ ...state, isUpdating: true, updateBrandId: brandId });
 
-    const foundBrand = listBrands && listBrands.find((brand) => brand.id === brandId);
+    const foundBrand =
+      listBrands && listBrands.find((brand) => brand.id === brandId);
 
     console.log("Brand found  ", JSON.stringify(foundBrand));
 
@@ -211,6 +213,34 @@ function Brands(props) {
     },
 
     {
+      title: "Selling",
+      dataIndex: "sell",
+      key: "sell",
+      responsive: ["sm"],
+      render: (_, record) => (
+        <div className="flex items-center">
+          {record.categories.map((cate) => (
+         <div className="ml-4">
+           <Button variant="outlined"  startIcon={<Image src={cate.imageUrl} width={20} height={20} className="rounded-full"  />}>
+          {cate.name}
+        </Button>
+          </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      title: "Sale Product",
+      dataIndex: "",
+      key: "",
+      responsive: ["sm"],
+      render: (_, record) => (
+        <h2 className="align-center">{record.categories.length}</h2>
+      ),
+    },
+
+
+    {
       title: "Action",
       responsive: ["sm"],
       render: (_, record) => (
@@ -305,7 +335,7 @@ function Brands(props) {
                     mode="multiple"
                     labelInValue
                     value={value}
-                    placeholder="Select users"
+                    placeholder="Select category sell"
                     filterOption={false}
                     onChange={handleChange}
                     style={{ width: "100%" }}

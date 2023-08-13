@@ -4,7 +4,42 @@ import cookie from "cookie";
 async function User(req, res) {
   const { token } = cookie.parse(req.headers.cookie);
 
-  if (req.method === "POST") {
+  if (req.method === "POST" && req.query.action == "create_user") {
+
+
+    console.log(
+    "Req body in api" , req.body
+    );
+
+    const form = new FormData();
+
+    form.append(
+      "user",
+      new Blob([req.body], {
+        type: "application/json",
+      })
+      // req.body
+    );
+
+
+    const resPos = await fetch(`${API_URL}/user/create-new`, {
+      
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // 'Content-Type': 'multipart/form-data' 
+      },
+      body: form,
+    });
+
+    const dataPos = await resPos.json();
+
+    if (!resPos.ok) {
+      res.status(500).json({ message: dataPos.message });
+    } else {
+      res.status(200).json({ user: dataPos });
+    }
+  } else if (req.method === "POST") {
     const resPos = await fetch(`${API_URL}/user/addAddress`, {
       method: "POST",
       headers: {
@@ -87,18 +122,14 @@ async function User(req, res) {
       res.status(200).json({ user: dataGet });
     }
   } else if (req.method == "PUT" && req.query.action === "update_status") {
-
-    console.log("Body req " , (req.body));
-    const {customerId, status} = req.body;
-    const resGet = await fetch(
-      `${API_URL}/user/${customerId}/${status}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    console.log("Body req ", req.body);
+    const { customerId, status } = req.body;
+    const resGet = await fetch(`${API_URL}/user/${customerId}/${status}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     const dataGet = await resGet.text();
 

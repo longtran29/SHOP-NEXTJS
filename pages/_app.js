@@ -7,9 +7,12 @@ import { DataProvider } from "@/context/DataContext";
 import { FilterProvider } from "@/context/FilterContext";
 import { CartProvider } from "@/context/CartContext";
 import { OrderProvider } from "@/context/OrderContext";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 import {
   PayPalScriptProvider
 } from "@paypal/react-paypal-js";
+
 
 
 export default function App(props) {

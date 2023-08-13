@@ -45,6 +45,7 @@ export default function Shop() {
 
   const [currentPage, setCurrentPage] = useState(1);
 
+
   let filteredItems =
     listProds &&
     listProds.filter(
@@ -62,7 +63,7 @@ export default function Shop() {
 
     if (selectedBrand) {
       filteredProducts = filteredProducts.filter(
-        (product) => product.brand.name === selectedBrand
+        (product) => product.brand.name == selectedBrand
       );
     }
 
@@ -98,7 +99,7 @@ export default function Shop() {
   return (
     <div className="bg-white">
       <div>
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-2">
           <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
               New Arrivals
@@ -213,7 +214,25 @@ export default function Shop() {
                       </h3>
                       <Disclosure.Panel className="pt-6">
                         <div className="space-y-4">
-                          <h3 className="font-bold text-md"> Category </h3>
+                          {
+                            [18, 20, 20, 120.15].map(price => (
+                              <div
+                              key={price}
+                              className="flex items-center"
+                            >
+                              <input
+                                name="original_price"
+                                type="radio"
+                                value={price}
+                                onChange={(e) => handleChange(e)}
+                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                              />
+                              <label className="ml-2 min-w-0 flex-1 text-gray-500">
+                                  {price} $
+                                </label>
+                            </div>
+                            ))
+                          }
                         </div>
                       </Disclosure.Panel>
                     </>
@@ -300,9 +319,9 @@ export default function Shop() {
                 <div className="flex ml-16">
                   <button
                     className={`ml-4 px-4 py-1.5 ${
-                      selectedBrand == "All" ? "bg-red-200" : ""
+                      selectedBrand == "All" ? "bg-primary-400" : ""
                     }`}
-                    value="All"
+                    value=""
                     onClick={(e) => {
                       console.log("selected brand", e.target.value);
                       setSelectedBrand(e.target.value);
@@ -314,7 +333,7 @@ export default function Shop() {
                     listBrands.map((brand) => (
                       <button
                         className={`ml-4 px-4 py-1.5 ${
-                          selectedBrand == brand.name ? "bg-red-200" : ""
+                          selectedBrand == brand.name ? "bg-primary-200" : ""
                         }`}
                         value={brand.name}
                         onClick={(e) => {
@@ -328,19 +347,19 @@ export default function Shop() {
                 </div>
                 <div className="w-full flex justify-center mt-10">
                   {result && (
-                    <Row className="p-12">
+                    <Row className="p-4">
                       <Col flex="1">
                         <div className="grid grid-cols-4 gap-4 h-full">
-                          <Product data={result} dataLimit={4} />
+                          <Product data={result} dataLimit={4} currentPage= {currentPage} />
                         </div>
                       </Col>
-                      <div className="w-full flex justify-center mt-10">
+                      <div className="w-full flex justify-center">
                         {isLoading ? (
                           <SpinTip />
                         ) : (
                           result.length > 0 && (
                             <Pagination
-                              className="w-1/3"
+                              // className="w-2/3"
                               onChange={(page, pageSize) =>
                                 setCurrentPage(page)
                               }

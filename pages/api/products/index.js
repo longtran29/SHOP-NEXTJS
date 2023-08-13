@@ -6,6 +6,8 @@ import cookie from "cookie";
 import formidable from "formidable";
 import fs from "fs";
 
+
+// this prevent parse the req.body
 export const config = {
   api: {
     bodyParser: false,
@@ -64,30 +66,6 @@ async function products(req, res) {
     } else {
       res.status(200).json({ products: dataPos });
     }
-  } else if (req.method == "PUT" && req.query.action == "update_status") {
-    const { token } = cookie.parse(req.headers.cookie);
-
-    console.log("Value is ",token,  req.query.productId, req.query.status);
-
-    const resPost = await fetch(
-      `${API_URL}/products/status/${req.query.productId}/${req.query.status}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(req.body)
-      }
-    );
-
-    const dataPos = await resPost.json();
-
-    if (!resPost.ok) {
-      res.status(500).json({ message: dataPos.message });
-    } else {
-      console.log("Update product ", JSON.stringify(dataPos));
-      res.status(200).json({ product: dataPos });
-    }
   } else if (req.method === "GET" && req.query.action == "get_detail") {
     const { productId } = req.query;
 
@@ -127,7 +105,7 @@ async function products(req, res) {
   
   else if (req.method == "GET") {
     console.log("Da vao get trong api product");
-    const resGet = await fetch(`${API_URL}/products/active`, {
+    const resGet = await fetch(`${API_URL}/products`, {
       method: "GET",
     });
 

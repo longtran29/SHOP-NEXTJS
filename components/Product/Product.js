@@ -2,9 +2,8 @@ import React, { Fragment, useState } from "react";
 import ProductCard from "./ProductCard";
 import { useFilterContext } from "@/context/FilterContext";
 
-function Product({ data, dataLimit }) {
+function Product({ data, dataLimit, currentPage }) {
   const pages = Math.ceil(data.length / dataLimit);
-  const { currentPage } = useFilterContext();
   const getPaginationData = () => {
     const startIdx = currentPage * dataLimit - dataLimit;
     const endIdx = startIdx + dataLimit;
@@ -17,21 +16,13 @@ function Product({ data, dataLimit }) {
 
   return (
     <Fragment>
-      {data.length > 0 ? (
-        <>
-          {getPaginationData().map((product) => (
+      {getPaginationData().map((product) => (
             <ProductCard
-              className="productcard"
+              
               key={product.id}
               productDetails={product}
             />
           ))}
-        </>
-      ) : (
-        <div className="flex container">
-          <h1>Không có sản phẩm danh mục này</h1>
-        </div>
-      )}
     </Fragment>
   );
 }

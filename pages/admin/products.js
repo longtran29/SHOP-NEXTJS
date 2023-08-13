@@ -51,7 +51,9 @@ function Products(props) {
         adminProducts.filter(
           (cate) =>
             cate.name.toLowerCase().includes(searchValue) ||
-            cate.category.name.toLowerCase().includes(searchValue)
+            cate.category.name.toLowerCase().includes(searchValue) || 
+            cate.brand.name.toLowerCase().includes(searchValue) || 
+            cate.original_price == (searchValue)
         )
       );
     } else setShowProduct(adminProducts);
@@ -104,15 +106,9 @@ function Products(props) {
   // update status
   const updateStatus = async (productId, status) => {
     const resPut = await fetch(
-      `${NEXT_API}/api/products?action=update_status&productId=${productId}`,
+      `${NEXT_API}/api/products/update?action=update_status&productId=${productId}&status=${status ? "disabled" : "enabled"}`,
       {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: status,
-        }),
+        method: "PUT"
       }
     );
 
@@ -121,7 +117,7 @@ function Products(props) {
       toast.error(data.message);
     } else {
       getProductAdmin();
-      toast.success("Update successful !");
+      status ? toast.error("Deactived!") : toast.success("Activated !");
     }
   };
 
@@ -168,6 +164,7 @@ function Products(props) {
       dataIndex: "original_price",
       key: "original_price",
       responsive: ["lg"],
+      render: (_, record) => <h2>{record.original_price} $</h2>
     },
 
     {
@@ -191,7 +188,7 @@ function Products(props) {
       responsive: ["lg"],
       render: (_, record) =>
         record.inStock ? (
-          <Chip label="Stock" color="primary" />
+          <Chip label="In stock" color="primary" />
         ) : (
           <Chip label="Sold out" color="success" />
         ),

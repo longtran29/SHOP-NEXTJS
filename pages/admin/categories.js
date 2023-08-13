@@ -358,7 +358,7 @@ function Categories(props) {
           <div>
             <Modal
               className="p-4 mt-20"
-              title={state.isUpdating ? "Cập nhật danh mục" : "Thêm danh mục"}
+              title={state.isUpdating ? "Update category" : "Add new category"}
               open={isModalOpen}
               onOk={handleOk}
               onCancel={handleCancel}

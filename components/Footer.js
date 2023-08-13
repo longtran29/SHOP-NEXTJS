@@ -7,7 +7,7 @@ const style = {
 
 export default function Footer() {
   return (
-    <div className="bg-black p-5 text-white">
+    <div className="bg-black p-20 text-white">
       <Row gutter={16}>
         <Col className="gutter-row" span={6}>
           <div style={style}>
