@@ -22,7 +22,7 @@ function Brands(props) {
 
   const { value } = state;
 
-  const { listBrands, listCates, updateBrands, getBrands } =
+  const { listBrands, listCates, getBrands } =
     useContext(DataContext);
 
   const antIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
@@ -52,7 +52,7 @@ function Brands(props) {
     setIsModalOpen(true);
     setState({ ...state, isUpdating: true, updateBrandId: brandId });
 
-    const foundBrand = listBrands.find((brand) => brand.id === brandId);
+    const foundBrand = listBrands && listBrands.find((brand) => brand.id === brandId);
 
     console.log("Brand found  ", JSON.stringify(foundBrand));
 
@@ -181,7 +181,7 @@ function Brands(props) {
 
   let options = [];
 
-  if (listCates.length > 0) {
+  if (listCates && listCates.length > 0) {
     options = listCates.map((cate) => ({
       text: cate.name.toString(),
       value: cate.id,
