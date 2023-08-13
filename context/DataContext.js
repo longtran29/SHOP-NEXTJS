@@ -1,18 +1,25 @@
 import { API_URL, NEXT_API } from "@/config";
 import { createContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const DataContext = createContext();
 
 export function DataProvider({ children }) {
   const [state, setState] = useState({
-    listCates: [],
-    listBrands: [],
+    listCates: null,
+    listBrands: null,
     listProds: [],
+    productAdmin: [],
     isLoading: false,
   });
   const [error, setError] = useState("");
   const [userInfo, setUserInfo] = useState(null);
-  const [allUser, setAllUser] =  useState([]);
+  const [allUser, setAllUser] = useState([]);
+  const [productDetail, setProductDetail] = useState(null);
+
+  const [searchOrderValue, setSearchOrderValue] = useState("");
+
+  console.log("Value search order " , searchOrderValue);
 
   useEffect(() => {
     console.log("Da goi trong useEffect get brand");
@@ -27,8 +34,27 @@ export function DataProvider({ children }) {
     getProducts();
   }, []);
 
+  const getProductDetail = async (prodId) => {
+    console.log("Da vao fetch prod detail ", prodId);
+    const resGet = await fetch(
+      `${NEXT_API}/api/products?action=get_detail&productId=${prodId}`,
+      {
+        method: "GET",
+      }
+    );
+
+    const dataGet = await resGet.json();
+
+    if (!resGet.ok) {
+      toast.error("Error" + dataGet.message);
+    } else {
+      console.log("prod fetched ", JSON.stringify(dataGet.productDetail));
+      // setFoundedProd(dataGet.productDetail);
+      setProductDetail(dataGet.productDetail);
+    }
+  };
+
   const getProducts = async () => {
-  
     setState((prevState) => ({ ...prevState, isLoading: true }));
     const response = await fetch(`${NEXT_API}/api/products`, {
       method: "GET",
@@ -43,6 +69,24 @@ export function DataProvider({ children }) {
       return data.products;
     }
     setState((prevState) => ({ ...prevState, isLoading: false }));
+  };
+
+  const getProductAdmin = async () => {
+    setState((prevState) => ({ ...prevState, isLoading: true }));
+    const response = await fetch(`${NEXT_API}/api/products?action=get_product_admin`, {
+      method: "GET",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // setError(data.message);
+      toast.error("Lỗi lấy danh sách sản phẩm admin");
+    } else {
+      // updateProducts(data.products); // default return object json with categories prop
+      // return data.products;
+      setState((prevState) => ({ ...prevState, isLoading: false, productAdmin: data.products }));
+    }
   };
 
   const getBrands = async () => {
@@ -144,7 +188,15 @@ export function DataProvider({ children }) {
     userInfo: userInfo,
     getUserInformation,
     allUser: allUser,
-    setAllUser
+    setAllUser,
+    productDetail,
+    getProductDetail,
+    adminProducts: state.productAdmin,
+    getProductAdmin,
+    setSearchOrderValue,
+    searchOrderValue : searchOrderValue,
+
+
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

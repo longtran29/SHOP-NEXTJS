@@ -31,6 +31,7 @@ function FilterSection(props) {
   const categoryData = getUniqueData(listCates);
 
   const updateFilterCate = (e) => {
+    console.log("selected cate ", e.target.value);
     setFilterCate(e);
     setCurrentPage(1);
   };

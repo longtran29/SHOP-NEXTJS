@@ -20,11 +20,16 @@ import { deepPurple } from "@mui/material/colors";
 import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import { NEXT_API } from "@/config";
 import { toast } from "react-toastify";
+import { Modal } from "antd";
 function UserOrderCard(props) {
   const { children, data } = props;
 
   const router = useRouter();
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  
+  const { confirm } = Modal;
+
 
   console.log("Data order detail is ", JSON.stringify(data));
 
@@ -61,17 +66,52 @@ function UserOrderCard(props) {
     }
   };
 
+  
+  const showDeleteConfirm = (productId) => {
+    confirm({
+      title: 'Are you sure delete this cart item?',
+      icon: <ExclamationCircleFilled />,
+      content: 'Delete this cart item',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        // const deleteCartItem = async () => {
+        //   const resDel = await fetch(
+        //     `${NEXT_API}/api/cart/${productId}`,
+        //     {
+        //       method: "DELETE",
+        //     }
+        //   );
+
+        //   const delData = await resDel.json();
+
+        //   if (!resDel.ok) {
+        //     toast.error(delData.message);
+        //   } else {
+        //     getCart();
+        //     toast.success("Xoá thành công");
+        //   }
+        // };
+
+        // deleteCartItem();
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
+
+
   return (
-    <div
-      className="shadow-sm p-2 hover:shadow-sm hover:cursor-pointer shadow-black mt-8"
-    >
+    <div className="shadow-sm p-2 hover:shadow-sm hover:cursor-pointer shadow-black mt-8">
       <Grid container spacing={2} className="flex items-center">
         <Grid item xs={6}>
           <div className="flex items-center">
             {data.orderDetails.map((product) => (
               <div className="h-[5rem] w-[5rem]">
                 <Image
-                  className=" cursor-pointer rounded-xl"
+                  className=" cursor-pointer rounded-full"
                   src={product.product.primaryImage}
                   width={150}
                   height={150}
@@ -135,23 +175,25 @@ function UserOrderCard(props) {
                   </div>
 
                   <div className="py-20">
-                    <Grid container className="flex items-center">
-                      <Grid xs={10}>
-                        <h2 className="mb-8">
-                          <span className="font-semibold opacity-70">
-                            Payment status{" "}
-                          </span>{" "}
-                          {selectedOrder.methodPayment == "PAY_PAL"
-                            ? <span className="text-primary-400">Paid</span>
-                            : "Wait for paid"}
-                        </h2>
+                    <h2 className="mb-8">
+                      <span className="font-semibold opacity-70">
+                        Payment status{" "}
+                      </span>{" "}
+                      {selectedOrder.methodPayment == "PAY_PAL" ? (
+                        <span className="text-primary-400">Paid</span>
+                      ) : (
+                        "Wait for paid"
+                      )}
+                    </h2>
+                    <Grid container alignItems="center">
+                      <Grid item xs={10}>
                         <OrderTracker
                           activeStep={[steps[selectedOrder.orderStatus]]}
                         />
                       </Grid>
-                      <Grid xs={2} className="">
+                      <Grid item xs={2}>
                         <button
-                          className="bg-primary-400 text-white px-3 py-2 rounded-sm hover:bg-primary-600"
+                          className="bg-primary-400 text-white px-3 py-2 rounded-sm hover:bg-primary-600 ml-4"
                           onClick={cancelOrder}
                         >
                           Cancel order
@@ -173,7 +215,7 @@ function UserOrderCard(props) {
                           <div className="h-[5rem] w-[5rem] hover:cursor-pointer">
                             <img src={detail.product.primaryImage} alt="" />
                           </div>
-                          
+
                           <div className="space-y-2 ml-5">
                             <p
                               className="hover:cursor-pointer font-semibold"
@@ -185,23 +227,16 @@ function UserOrderCard(props) {
                             >
                               {detail.product.name.toUpperCase()}
                             </p>
-                            {/* <p className="opacity-50 text-sm font-semibold">
-                  Seller: {detail.product.brand.name}
-                </p>
-                <p className="opacity-50 text-sm font-semibold">
-                  Categories: {detail.product.category.name}
-                </p>
-                <p className="font-extralight">
-                  {" "}
-                  $ {detail.product.original_price}
-                </p> */}
+                           
                           </div>
                         </Grid>
                         <Grid item>
-                          <Box sx={{ color: deepPurple[500] }}>
+                          <Box sx={{ color: deepPurple[500] }} className="hover:cursor-pointer" onClick={() => router.push(
+                                  `/product/detail/${detail.product.id}`
+                                )}>
                             <StarOutlineIcon
                               sx={{ fontSize: "2rem" }}
-                              className="px-2 text-xl h-[2rem] w-[2rem] "
+                              className="px-2 text-xl h-[2rem] w-[2rem]"
                             />
                             <span>Rate & Review Product</span>
                           </Box>

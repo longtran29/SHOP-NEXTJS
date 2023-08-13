@@ -20,7 +20,7 @@ export const FilterProvider = ({ children }) => {
   // update state filter when listProds or filter condition changes
   useEffect(() => {
     dispatch({ type: "FILTER_PRODUCTS" });
-  }, [state.filters, listProds, state.filter_cate]);
+  }, [state.filters, listProds]);
 
   const setFilterCate = (e) => {
     dispatch({ type: "CATEGORY_FILTER", payload: e.target.value });

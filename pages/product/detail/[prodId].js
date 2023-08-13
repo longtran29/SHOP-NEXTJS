@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 import CartContext from "@/context/CartContext";
 import { AddCircleOutline, RemoveCircleOutline } from "@mui/icons-material";
 import { toast } from "react-toastify";
-import { getAllProduct, getProductDetail } from "@/context/DataContext";
+import DataContext, { getAllProduct, getProductDetail } from "@/context/DataContext";
 import AuthContext from "@/context/AuthContext";
 import { useRouter } from "next/router";
 import { StarIcon } from "@heroicons/react/20/solid";
@@ -34,30 +34,39 @@ const ProductDetail = () => {
   const router = useRouter();
   const { prodId } = router.query;
 
-  const [foundedProd, setFoundedProd] = useState(null);
+  // const [productDetail, setproductDetail] = useState(null);
 
-  console.log("Product found ", JSON.stringify(foundedProd));
+  const {productDetail, getProductDetail} = useContext(DataContext);
+
+  // console.log("Product found ", JSON.stringify(productDetail));
+
+  // useEffect(() => {
+  //   if (prodId) {
+  //     (async () => {
+  //       console.log("Da vao fetch prod detail ", prodId);
+  //       const resGet = await fetch(
+  //         `${NEXT_API}/api/products?action=get_detail&productId=${prodId}`,
+  //         {
+  //           method: "GET",
+  //         }
+  //       );
+
+  //       const dataGet = await resGet.json();
+
+  //       if (!resGet.ok) {
+  //         toast.error("Error" + dataGet.message);
+  //       } else {
+  //         console.log("prod fetched ", JSON.stringify(dataGet.productDetail));
+  //         setproductDetail(dataGet.productDetail);
+  //       }
+  //     })();
+  //   }
+  // }, [prodId]);
+
 
   useEffect(() => {
     if (prodId) {
-      (async () => {
-        console.log("Da vao fetch prod detail ", prodId);
-        const resGet = await fetch(
-          `${NEXT_API}/api/products?action=get_detail&productId=${prodId}`,
-          {
-            method: "GET",
-          }
-        );
-
-        const dataGet = await resGet.json();
-
-        if (!resGet.ok) {
-          toast.error("Error" + dataGet.message);
-        } else {
-          console.log("prod fetched ", JSON.stringify(dataGet.productDetail));
-          setFoundedProd(dataGet.productDetail);
-        }
-      })();
+      getProductDetail(prodId);
     }
   }, [prodId]);
 
@@ -68,7 +77,7 @@ const ProductDetail = () => {
   };
 
   const images =
-    foundedProd && foundedProd.images.map((image) => image.imageProduct);
+    productDetail && productDetail.images.map((image) => image.imageProduct);
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -82,10 +91,11 @@ const ProductDetail = () => {
   };
 
   const items =
-    foundedProd &&
-    images.map((image) => {
+    productDetail &&
+    images.map((image, index) => {
       return (
         <Image
+        key={index}
           src={image}
           width={100}
           height={100}
@@ -101,17 +111,17 @@ const ProductDetail = () => {
       toast.error("Vui lòng đăng nhập để mua sản phẩm");
       return;
     }
-    addItemToCart({ productId: foundedProd.id, quantity: quantity });
+    addItemToCart({ productId: productDetail.id, quantity: quantity });
   };
 
-  const breadcrumbs = foundedProd && [
+  const breadcrumbs = productDetail && [
     { id: 1, name: "Home", href: "/" },
-    { id: 2, name: foundedProd.category.name, href: "/shop" },
+    { id: 2, name: productDetail.category.name, href: "/shop" },
   ];
 
   return (
     <div className="border-t-2 border-primary-200">
-      {foundedProd ? (
+      {productDetail ? (
         <>
           {/* <Breadcrumb
             className="p-2 border-1 border-solid bg-gray-100"
@@ -120,12 +130,12 @@ const ProductDetail = () => {
 
               {
                 href: "/shop",
-                title: foundedProd.category.name,
+                title: productDetail.category.name,
               },
 
               {
                 href: "/shop",
-                title: foundedProd.name,
+                title: productDetail.name,
               },
             ]}
           />
@@ -138,7 +148,7 @@ const ProductDetail = () => {
                   role="list"
                   className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8"
                 >
-                  {breadcrumbs.map((breadcrumb) => (
+                  {breadcrumbs.map((breadcrumb, index) => (
                     <li key={breadcrumb.id}>
                       <div className="flex items-center">
                         <a
@@ -165,7 +175,7 @@ const ProductDetail = () => {
                       aria-current="page"
                       className="font-medium text-gray-500 hover:text-gray-600"
                     >
-                      {foundedProd.name}
+                      {productDetail.name}
                     </a>
                   </li>
                 </ol>
@@ -175,18 +185,18 @@ const ProductDetail = () => {
                 <div className="flex flex-col items-center">
                   <div className="overflow-hidden rounded-lg max-w-[30rem] max-h-[35rem]">
                     <Image
-                      src={foundedProd.primaryImage}
-                      width={300}
-                      height={300}
+                      src={productDetail.primaryImage}
+                      width={400}
+                      height={400}
                     />
                   </div>
                   <div className="flex space-x-5 flex-wrap justify-center">
-                    {foundedProd.images.map((image) => (
-                      <div className="overflow-hidden rounded-lg max-w-[10rem] max-h-[10rem] mt-4 ">
+                    {productDetail.images.map((image, index) => (
+                      <div className="overflow-hidden rounded-lg max-w-[5rem] max-h-[5rem] mt-4 " key={index}>
                         <Image
                           src={image.imageProduct}
-                          width={150}
-                          height={150}
+                          width={100}
+                          height={100}
                           className="w-full h-auto"
                         />
                       </div>
@@ -198,33 +208,33 @@ const ProductDetail = () => {
                 <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-4xl lg:grid-cols-1 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16">
                   <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                      {foundedProd.name.toUpperCase()}
+                      {productDetail.name.toUpperCase()}
                     </h1>
                   </div>
 
                   {/* Options */}
                   <div className="mt-4 lg:row-span-3 lg:mt-0">
                     <h2 className="sr-only">Product information</h2>
-                    <p className="text-xl tracking-tight text-gray-900">
+                    <div className="text-xl tracking-tight text-gray-900">
                       <h2 className="font-bold font-md text-md mt-2">
                         <span className="text-red-500">
                           {(
-                            foundedProd.original_price -
-                            foundedProd.discount_percent *
-                              foundedProd.original_price
+                            productDetail.original_price -
+                            productDetail.discount_percent *
+                              productDetail.original_price
                           ).toFixed(2)}
                           $
                         </span>
                         <span className="ml-4 text-gray-500 line-through">
-                          {foundedProd.original_price.toFixed(2)}$
+                          {productDetail.original_price.toFixed(2)}$
                         </span>
                         <button className="ml-4 text-gray-500 bg-black text-white px-2 py-1 rounded-md">
-                          -{foundedProd.discount_percent}%
+                          -{productDetail.discount_percent}%
                         </button>
                       </h2>
-                    </p>
+                    </div>
                     <h2 className="text-blue-500 text-xl font-extralight text-md mt-2">
-                      {foundedProd.category.name}
+                      {productDetail.category.name}
                     </h2>
 
                     {/* Reviews */}
@@ -262,12 +272,12 @@ const ProductDetail = () => {
                       <p className="block opacity-70">Available: </p>
                       <p className="text-green-600 ml-2">
                         {" "}
-                        {foundedProd.inStock
+                        {productDetail.inStock
                           ? " In stock "
                           : "Out of stock"}{" "}
                       </p>
                       <p className="text-green-600 ml-2">
-                        {foundedProd.inStock ? (
+                        {productDetail.inStock ? (
                           <CheckOutlined />
                         ) : (
                           <MinusOutlined />
@@ -326,8 +336,8 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          <div className="p-8">
-            <ProductTab data={foundedProd} />
+          <div className="pl-8 pr-8">
+            <ProductTab data={productDetail} />
           </div>
         </>
       ) : (

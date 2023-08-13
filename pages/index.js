@@ -21,8 +21,8 @@ function Home(props) {
 
   const responsive = {
     0: { items: 1 },
-    568: { items: 2 },
-    1024: { items: 4 },
+    568: { items: 3 },
+    1024: { items: 5 },
   };
 
   useEffect(() => {
@@ -69,9 +69,9 @@ function Home(props) {
         {loading ? (
           <SpinTip />
         ) : (
-          <>
+          <div className="bg-gray-900">
             {items && (
-              <div className="p-2 bg-white flex flex-row justify-center items-center border border-2 border-gray-100">
+              <div className="p-2 bg-black text-white flex flex-row justify-center items-center">
                 <AliceCarousel
                   items={items}
                   responsive={responsive}
@@ -82,7 +82,7 @@ function Home(props) {
                   activeIndex={activeIndex}
                   onSlideChanged={syncActiveIndex}
                 />
-                {activeIndex < items.length - 4 && (
+                {activeIndex < items.length - 5 && (
                   <div className="px-1 py-2.5 bg-primary-100 text-black absolute hover:bg-primary-400 hover:text-white top-[16rem] right-6 hover:cursor-pointer">
                     <KeyboardArrowRightIcon
                       onClick={() => setActiveIndex(activeIndex + 1)}
@@ -98,7 +98,7 @@ function Home(props) {
                 )}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

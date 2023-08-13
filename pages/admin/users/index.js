@@ -98,6 +98,12 @@ function Products(props) {
       ),
     },
     {
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
+      responsive: ["lg"],
+    },
+    {
       title: "Email",
       dataIndex: "email",
       key: "email",

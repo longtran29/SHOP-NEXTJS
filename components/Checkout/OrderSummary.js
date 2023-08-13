@@ -14,7 +14,7 @@ function OrderSummary(props) {
       <AddressCard data={deliveryAddress} />
 
       <div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 mt-8">
           <div className="col-span-2 ">
             {cart.map((cartItem, index) => (
               <CartItem data={cartItem} />

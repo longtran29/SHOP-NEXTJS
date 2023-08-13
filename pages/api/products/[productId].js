@@ -85,7 +85,7 @@ async function product(req, res) {
         res.status(200).json({ message: "successful" });
       }
     }
-  } 
+  }
 }
 
 export default product;

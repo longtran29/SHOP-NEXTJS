@@ -2,13 +2,14 @@ import DataContext from "@/context/DataContext";
 import { useContext } from "react";
 
 export const intialState = {
-  filter_cate: "-1",
   filter_products: [],
   all_product: [],
   currentPage: 1,
   filters: {
-    text: "",
-    category: "",
+    filter_cate: "",
+    filter_brand: "",
+    filter_price: "",
+    filter_product: ""
   },
 };
 
@@ -17,7 +18,7 @@ export const reducer = (state, action) => {
     case "CATEGORY_FILTER":
       return {
         ...state,
-        filter_cate: action.payload,
+        filters: {...state.filters, filter_cate: action.payload}
       };
 
     case "LOAD_INITIAL_PRODUCT":

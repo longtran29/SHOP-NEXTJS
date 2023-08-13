@@ -4,12 +4,12 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { NEXT_API } from "@/config";
-import { toast } from "react-toastify";
 import SpinTip from "@/components/loading/SpinTip";
 import OrderDashboard from "@/components/Order/OrderDashboard";
 import AdminLayout from "@/layouts/AdminLayout";
 import OrderContext from "@/context/OrderContext";
+import DataContext from "@/context/DataContext";
+import { Input } from "antd";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -47,15 +47,21 @@ function a11yProps(index) {
 export default function Orders() {
   const [value, setValue] = React.useState(0);
 
+  const { searchOrderValue, setSearchOrderValue } =
+    React.useContext(DataContext);
+
+  const { Search } = Input;
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const {orderManagement, updateOrderManagement} = React.useContext(OrderContext);
+  const { orderManagement, updateOrderManagement } =
+    React.useContext(OrderContext);
 
   React.useEffect(() => {
     updateOrderManagement();
-  }, []);   // tạo ra hàm cập nhật giá trị cho state riêng
+  }, []); // tạo ra hàm cập nhật giá trị cho state riêng
 
   const setUpData = (option) => {
     switch (option) {
@@ -64,25 +70,47 @@ export default function Orders() {
       case "NEW":
         return orderManagement.filter((order) => order.orderStatus == "NEW");
 
-        case "CONFIRM":
-        return orderManagement.filter((order) => order.orderStatus == "CONFIRM");
+      case "CONFIRM":
+        return orderManagement.filter(
+          (order) => order.orderStatus == "CONFIRM"
+        );
 
       case "SHIPPED":
-        return orderManagement.filter((order) => order.orderStatus == "SHIPPED");
+        return orderManagement.filter(
+          (order) => order.orderStatus == "SHIPPED"
+        );
 
-        case "ON THE WAY":
-          return orderManagement.filter((order) => order.orderStatus == "ON_THE_WAY");
+      case "ON THE WAY":
+        return orderManagement.filter(
+          (order) => order.orderStatus == "ON_THE_WAY"
+        );
 
-        case "DELIVERED":
-          return orderManagement.filter((order) => order.orderStatus == "DELIVERED");
+      case "DELIVERED":
+        return orderManagement.filter(
+          (order) => order.orderStatus == "DELIVERED"
+        );
 
       case "CANCELED":
-        return orderManagement.filter((order) => order.orderStatus == "CANCELED");
+        return orderManagement.filter(
+          (order) => order.orderStatus == "CANCELED"
+        );
     }
   };
 
   return (
-    <React.Fragment>
+    <div className="p-4">
+      <div className="mb-4 mt-4">
+        <div className="flex justify-between items-center">
+          <Search
+            placeholder="find order based id/ username / address / status order"
+            enterButton="Search"
+            size="large"
+            className="w-2/3 font-bold"
+            value={searchOrderValue}
+            onChange={(e) => setSearchOrderValue(e.target.value)}
+          />
+        </div>
+      </div>
       {orderManagement.length > 0 ? (
         <Box sx={{ width: "100%" }}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -100,32 +128,67 @@ export default function Orders() {
               <Tab label="CANCELED" {...a11yProps(6)} />
             </Tabs>
           </Box>
-          <OrderDashboard value={value} index={0} data={setUpData("all")} option="all">
+          <OrderDashboard
+            value={value}
+            index={0}
+            data={setUpData("all")}
+            option="all"
+          >
             Item One
           </OrderDashboard>
-          <OrderDashboard value={value} index={1} data={setUpData("NEW")} option="NEW">
+          <OrderDashboard
+            value={value}
+            index={1}
+            data={setUpData("NEW")}
+            option="NEW"
+          >
             Item Two
           </OrderDashboard>
-          <OrderDashboard value={value} index={2} data={setUpData("CONFIRM")} option="CONFIRM">
+          <OrderDashboard
+            value={value}
+            index={2}
+            data={setUpData("CONFIRM")}
+            option="CONFIRM"
+          >
             Item Two
           </OrderDashboard>
-          <OrderDashboard value={value} index={3} data={setUpData("SHIPPED")} option="SHIPPED">
+          <OrderDashboard
+            value={value}
+            index={3}
+            data={setUpData("SHIPPED")}
+            option="SHIPPED"
+          >
             Item Three
           </OrderDashboard>
-          <OrderDashboard value={value} index={4} data={setUpData("ON THE WAY")} option="ON_THE_WAY">
+          <OrderDashboard
+            value={value}
+            index={4}
+            data={setUpData("ON THE WAY")}
+            option="ON_THE_WAY"
+          >
             Item Three
           </OrderDashboard>
-          <OrderDashboard value={value} index={5} data={setUpData("DELIVERED")} option="DELIVERED">
+          <OrderDashboard
+            value={value}
+            index={5}
+            data={setUpData("DELIVERED")}
+            option="DELIVERED"
+          >
             Item Three
           </OrderDashboard>
-          <OrderDashboard value={value} index={6} data={setUpData("CANCELED")} option="CANCELED">
+          <OrderDashboard
+            value={value}
+            index={6}
+            data={setUpData("CANCELED")}
+            option="CANCELED"
+          >
             Item Three
           </OrderDashboard>
         </Box>
       ) : (
         <SpinTip />
       )}
-    </React.Fragment>
+    </div>
   );
 }
 

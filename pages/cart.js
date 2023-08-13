@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
 import emptycart from "../public/images/emptycart.jpg";
 import Image from "next/image";
+import { Grid } from "@mui/material";
 
 function Cart(props) {
   const { cart, getCart } = useContext(CartContext);
@@ -25,14 +26,16 @@ function Cart(props) {
   return (
     <div className="p-4">
       {cart.length > 0 ? (
-        <div classNam="grid grid-cols-3">
-          <div className="col-span-2 ">
+        <Grid container alignItems="center" justifyItems="center">
+          <Grid item xs={7}>
             {cart.map((cartItem, index) => (
               <CartItem data={cartItem} key={index} />
             ))}
-          </div>
-          <CartSummary option="cart"  classNam="col-1" />
-        </div>
+          </Grid>
+          <Grid item xs={5}>
+            <CartSummary option="cart" classNam="col-1" />
+          </Grid>
+        </Grid>
       ) : (
         <div className="flex-row-center image-container">
           <div className="empty-page-text relative">
@@ -52,9 +55,8 @@ function Cart(props) {
             width={0}
             height={0}
             sizes="100vw"
-            style={{ width: '100%', height: 'auto' }} // optional
+            style={{ width: "100%", height: "auto" }} // optional
           />
-
         </div>
       )}
     </div>

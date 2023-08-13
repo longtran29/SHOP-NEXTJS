@@ -11,7 +11,7 @@ async function Cart(req, res) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: req.body,
+      body: req.body
     });
 
     const dataPos = await resPos.json();

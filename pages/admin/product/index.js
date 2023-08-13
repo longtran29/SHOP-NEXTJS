@@ -44,13 +44,18 @@ function AddProduct(props) {
     productQuantity: 1,
     details: [{ name: "", value: "" }],
   });
-  const { listBrands, listCates, getProducts, listProds } =
+  const { listBrands, listCates, getProductAdmin, adminProducts } =
     useContext(DataContext);
   const [images, setImages] = useState([]);
 
   const { defaultCate } = state;
 
   const { details } = product;
+
+  useEffect(() => {
+    getProductAdmin();
+  }, []);
+
 
   // const [details, setdetails] = useState([{ name: "", value: "" }]);
 
@@ -103,6 +108,7 @@ function AddProduct(props) {
       }));
     }
   }, [listBrands, listCates]); // 2 dependency
+  
 
   // upload product
   const createProduct = async () => {
@@ -130,7 +136,7 @@ function AddProduct(props) {
     if (!resPos.ok) {
       toast.error(posData.message);
     } else {
-      getProducts();
+      getProductAdmin();
       router.push("/admin/products");
       toast.success("Thêm sản phẩm thành công");
     }

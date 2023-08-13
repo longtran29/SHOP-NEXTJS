@@ -1,5 +1,6 @@
 import { API_URL } from "@/config";
 import { File } from "buffer";
+import { log } from "console";
 
 import cookie from "cookie";
 import formidable from "formidable";
@@ -63,32 +64,70 @@ async function products(req, res) {
     } else {
       res.status(200).json({ products: dataPos });
     }
-  } 
-  
-  else if(req.method === "GET" && req.query.action == "get_detail") {
+  } else if (req.method == "PUT" && req.query.action == "update_status") {
+    const { token } = cookie.parse(req.headers.cookie);
 
-  
-    const {productId} = req.query;
+    console.log("Value is ",token,  req.query.productId, req.query.status);
 
-    console.log("Da vao get detail " , productId);
+    const resPost = await fetch(
+      `${API_URL}/products/status/${req.query.productId}/${req.query.status}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(req.body)
+      }
+    );
+
+    const dataPos = await resPost.json();
+
+    if (!resPost.ok) {
+      res.status(500).json({ message: dataPos.message });
+    } else {
+      console.log("Update product ", JSON.stringify(dataPos));
+      res.status(200).json({ product: dataPos });
+    }
+  } else if (req.method === "GET" && req.query.action == "get_detail") {
+    const { productId } = req.query;
+
+    console.log("Da vao get detail ", productId);
 
     const resGet = await fetch(`${API_URL}/products/${productId}`, {
       method: "GET",
     });
-  
+
     const dataPos = await resGet.json();
-  
+
     if (!resGet.ok) {
       res.status(500).json({ message: dataPos.message });
     } else {
-      console.log("Product detail is " , JSON.stringify(dataPos));
+      console.log("Product detail is ", JSON.stringify(dataPos));
       res.status(200).json({ productDetail: dataPos });
     }
   }
-
-  else if (req.method == "GET") {
+  else if (req.method == "GET" && req.query.action == "get_product_admin") {
     console.log("Da vao get trong api product");
     const resGet = await fetch(`${API_URL}/products`, {
+      method: "GET",
+    });
+
+    const dataPos = await resGet.json();
+
+    console.log("Da qua datapost");
+
+    if (!resGet.ok) {
+      console.log("Loi la " + JSON.stringify(dataPos));
+      res.status(500).json({ message: dataPos.message });
+    } else {
+      console.log("ds pros " + JSON.stringify(dataPos));
+      res.status(200).json({ products: dataPos });
+    }
+  }  
+  
+  else if (req.method == "GET") {
+    console.log("Da vao get trong api product");
+    const resGet = await fetch(`${API_URL}/products/active`, {
       method: "GET",
     });
 

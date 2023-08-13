@@ -21,7 +21,7 @@ function UpdateProduct(props) {
   const router = useRouter();
   const updateProdId = router.query.updateId;
 
-  const { listBrands, listCates, getProducts, listProds } =
+  const { listBrands, listCates, getProductAdmin, adminProducts } =
     useContext(DataContext);
 
   const [state, setState] = useState({
@@ -124,10 +124,10 @@ function UpdateProduct(props) {
     if (
       listBrands.length > 0 &&
       listCates.length > 0 &&
-      listProds.length > 0 &&
+      adminProducts.length > 0 &&
       router.query.updateId != null
     ) {
-      let existedProduct = listProds.find(
+      let existedProduct = adminProducts.find(
         (prod) => prod.id == router.query.updateId
       );
 
@@ -151,7 +151,7 @@ function UpdateProduct(props) {
         isLoading: false,
       }));
     }
-  }, [listBrands, listCates, listProds, router.query.updateId]); // 3 deps
+  }, [listBrands, listCates, adminProducts, router.query.updateId]); // 3 deps
 
   // upload product
   const updateProduct = async () => {
@@ -187,7 +187,7 @@ function UpdateProduct(props) {
       toast.error(posData.message);
     } else {
       router.push("/admin/products");
-      getProducts();
+      getProductAdmin();
       toast.success("Cập nhật  sản phẩm thành công");
     }
 

@@ -33,7 +33,7 @@ function DeliveryAddressForm(props) {
     addNewAddress(address);
   };
   return (
-    <div>
+    <div className="mt-8 p-4">
       {
         userInfo != null && <>
         {isLoading? <SpinTip /> : <Grid container spacing={2} className="mt-4">

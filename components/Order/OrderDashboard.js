@@ -1,7 +1,7 @@
 import { Box, Chip, Grid, Typography } from "@mui/material";
 import { Select, Table } from "antd";
 import Image from "next/image";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MdDeleteOutline, MdEmail } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
 import {
@@ -21,6 +21,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import OrderCard from "./OrderCard";
 import { FaRegAddressBook } from "react-icons/fa";
+import DataContext from "@/context/DataContext";
 
 function OrderDashboard(props) {
   const { children, value, index, data, option, ...other } = props;
@@ -32,6 +33,29 @@ function OrderDashboard(props) {
   const [open, setOpen] = useState(false);
   const [fullWidth, setFullWidth] = useState(true);
   const [maxWidth, setMaxWidth] = useState("md");
+
+  // hỗ trợ cho việc lọc , searching input
+  const [showOrder, setShowOrder] = useState(data);
+
+  const { searchOrderValue, setSearchOrderValue } = useContext(DataContext);
+
+  useEffect(() => {
+    if (searchOrderValue) {
+      console.log("Da vao day ne  ", JSON.stringify(data) );
+      setShowOrder(
+        data.filter(
+          (order) =>
+            order.user.username.toLowerCase().includes(searchOrderValue) || 
+            order.address.address.toLowerCase().includes(searchOrderValue) ||
+            order.orderStatus.toLowerCase().includes(searchOrderValue) ||
+            order.id.includes(searchOrderValue)
+        )
+      );
+
+   
+    } else 
+    setShowOrder(data);
+  }, [searchOrderValue, data]);
 
   const handleMaxWidthChange = (event) => {
     setMaxWidth(
@@ -112,7 +136,6 @@ function OrderDashboard(props) {
       render: (_, record) => <h2 className="ml-4">{record.orderDate}</h2>,
     },
 
-    
     {
       title: "Total price",
       dataIndex: "price",
@@ -190,18 +213,16 @@ function OrderDashboard(props) {
             {
               value: "DELIVERED",
               label: "delivered",
-            }
+            },
           ]}
         />
       ),
     };
-  
-    
+
     const insertIndex = 4;
-  
+
     columns.splice(insertIndex, 0, statusColumn);
   }
-  
 
   return (
     <div
@@ -214,9 +235,10 @@ function OrderDashboard(props) {
       {value === index && data.length > 0 && (
         <Box sx={{ p: 3 }}>
           <div className="p-10">
-            <Table
+            {
+              showOrder && <Table
               columns={columns}
-              dataSource={data}
+              dataSource={showOrder}
               pagination={{
                 pageSizeOptions: ["50", "100"],
                 showSizeChanger: true,
@@ -224,6 +246,7 @@ function OrderDashboard(props) {
               }}
               rowKey={(record) => record.id}
             />
+            }
             <div></div>
           </div>
         </Box>

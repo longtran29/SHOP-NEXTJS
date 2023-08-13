@@ -10,13 +10,12 @@ import { useRouter } from "next/router";
 import React, { Fragment, useContext, useState, useEffect } from "react";
 import { BiSolidEdit } from "react-icons/bi";
 import { MdDeleteOutline } from "react-icons/md";
-import { RxUpdate } from "react-icons/rx";
 import { toast } from "react-toastify";
 
 function Products(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { getProducts, listProds } = useContext(DataContext);
-  const { filter_products, updateFilterValue } = useFilterContext();
+  const { getProductAdmin, adminProducts } = useContext(DataContext);
+  // const { filter_products, updateFilterValue } = useFilterContext();
   const [state, setState] = useState({
     imagePreview: "",
     imageData: null,
@@ -42,20 +41,25 @@ function Products(props) {
 
   const Search = Input.Search;
 
-  const [showProduct, setShowProduct] = useState(listProds);
+  const [showProduct, setShowProduct] = useState(adminProducts);
 
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     if (searchValue) {
       setShowProduct(
-        listProds.filter((cate) =>
-          cate.name.toLowerCase().includes(searchValue)
+        adminProducts.filter(
+          (cate) =>
+            cate.name.toLowerCase().includes(searchValue) ||
+            cate.category.name.toLowerCase().includes(searchValue)
         )
       );
-    } else setShowProduct(listProds);
-  }, [searchValue, listProds]);
+    } else setShowProduct(adminProducts);
+  }, [searchValue, adminProducts]);
 
+  useEffect(() => {
+    getProductAdmin();
+  }, []);
 
   const router = useRouter();
 
@@ -86,7 +90,7 @@ function Products(props) {
           if (!resDel.ok) {
             toast.error(delData.message);
           } else {
-            getProducts();
+            getProductAdmin();
             toast.success("Xoá thành công");
           }
         };
@@ -99,22 +103,25 @@ function Products(props) {
 
   // update status
   const updateStatus = async (productId, status) => {
-    const resPut = await fetch(`${NEXT_API}/api/products/${productId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        status: !status,
-      }),
-    });
-
-    const data = await resPut.json();
+    const resPut = await fetch(
+      `${NEXT_API}/api/products?action=update_status&productId=${productId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: status,
+        }),
+      }
+    );
 
     if (!resPut.ok) {
+      const data = await resPut.json();
       toast.error(data.message);
     } else {
-      getProducts();
+      getProductAdmin();
+      toast.success("Update successful !");
     }
   };
 
@@ -195,8 +202,10 @@ function Products(props) {
       responsive: ["sm"],
       render: (_, record) => (
         <div className="flex items-center">
-          <BiSolidEdit onClick={() => updateProduct(record.id)}
-            className="hover:cursor-pointer text-xl hover:text-red-700" />
+          <BiSolidEdit
+            onClick={() => updateProduct(record.id)}
+            className="hover:cursor-pointer text-xl hover:text-red-700"
+          />
 
           <MdDeleteOutline
             className="text-red-400 hover:text-blue-700 text-xl ml-6 hover:cursor-pointer"
@@ -216,14 +225,13 @@ function Products(props) {
         />
       ) : (
         <div className="p-10">
-        
           <div className="mb-4">
             <div className="flex justify-between items-center">
               <Search
-                placeholder="find your product"
+                placeholder="find your product based name/ category name"
                 enterButton="Search"
                 size="large"
-                className="w-1/3"
+                className="w-2/3"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
               />
@@ -243,18 +251,20 @@ function Products(props) {
               </button>
             </div>
           </div>
-         {
-          showProduct ?  <Table
-          columns={columns}
-          dataSource={showProduct}
-          pagination={{
-            pageSizeOptions: ["50", "100"],
-            showSizeChanger: true,
-            pageSize: 6,
-          }}
-          rowKey={(record) => record.id}
-        /> : <SpinTip />
-         }
+          {showProduct ? (
+            <Table
+              columns={columns}
+              dataSource={showProduct}
+              pagination={{
+                pageSizeOptions: ["50", "100"],
+                showSizeChanger: true,
+                pageSize: 6,
+              }}
+              rowKey={(record) => record.id}
+            />
+          ) : (
+            <SpinTip />
+          )}
         </div>
       )}
     </Fragment>

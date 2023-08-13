@@ -73,7 +73,7 @@ function CartItem({ data }) {
   }
   
   return (
-    <div className="p-5 border shadow-lg rounded-md mt-2">
+    <div className="p-5 border shadow-lg rounded-md ">
       <div className="flex">
         <div className="h-[5rem] w-[5rem]">
           <img
