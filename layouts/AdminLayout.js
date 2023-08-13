@@ -78,8 +78,8 @@ const AdminLayout = ({ children }) => {
     getItem("Category", "5", <BiSolidCategory />, "/admin/categories"),
     getItem("Brands", "6", <TbBrandEnvato />, "/admin/brands"),
     getItem("Order", "7", <GiBeachBag />, "/admin/orders"),
-    getItem("Blogs", "8", <BsFillPostcardHeartFill />, "/admin/blogs"),
-    getItem("Thống kê", "9", <BiSolidReport />, "/admin/report"),
+    // getItem("Blogs", "8", <BsFillPostcardHeartFill />, "/admin/blogs"),
+    // getItem("Thống kê", "9", <BiSolidReport />, "/admin/report"),
   ];
 
   const handleClick = ({ item, key }) => {
