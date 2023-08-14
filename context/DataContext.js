@@ -187,6 +187,7 @@ export function DataProvider({ children }) {
     addNewAddress,
     userInfo: userInfo,
     getUserInformation,
+    
     allUser: allUser,
     setAllUser,
     productDetail,

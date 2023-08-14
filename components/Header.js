@@ -96,6 +96,8 @@ function classNames(...classes) {
 export default function Header() {
   const { user, logout } = useContext(AuthContext);
 
+  console.log("User info trong header " , user);
+
   const [profileOpen, setProfileOpen] = useState(false);
 
   const { cart, getCart } = useContext(CartContext);

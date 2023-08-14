@@ -93,19 +93,22 @@ function Products(props) {
 
   // handle confirm form add user
   const handleOk = async () => {
-    const formDataToSend = new FormData();
-    formDataToSend.append("username", newUser.username);
-    formDataToSend.append("password", newUser.password);
-    formDataToSend.append("email", newUser.email);
-    formDataToSend.append("name", newUser.name);
-    formDataToSend.append("phoneNumber", newUser.phoneNumber);
-    formDataToSend.append("enabled", newUser.enabled);
-    formDataToSend.append("imgURL", newUser.imgURL); // Append the image
+    // const formDataToSend = new FormData();
+    // formDataToSend.append("username", newUser.username);
+    // formDataToSend.append("password", newUser.password);
+    // formDataToSend.append("email", newUser.email);
+    // formDataToSend.append("name", newUser.name);
+    // formDataToSend.append("phoneNumber", newUser.phoneNumber);
+    // formDataToSend.append("enabled", newUser.enabled);
+    // formDataToSend.append("imgURL", newUser.imgURL); // Append the image
 
     const resPut = await fetch(`${NEXT_API}/api/user?action=create_user`, {
       method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+    },
 
-      body: formDataToSend,
+      body: newUser,
     });
 
     const putData = await resPut.json();
@@ -139,8 +142,10 @@ function Products(props) {
       const dataGet = await resGet.json();
 
       if (!resGet.ok) {
+        
         toast.error("Get user fail");
       } else {
+        console.log("List use returned ", JSON.stringify(dataGet.users));
         setAllUser(dataGet.users);
       }
       setIsLoading(false);

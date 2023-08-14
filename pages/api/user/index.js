@@ -11,25 +11,22 @@ async function User(req, res) {
     "Req body in api" , req.body
     );
 
-    const form = new FormData();
+    // const form = new FormData();
 
-    form.append(
-      "user",
-      new Blob([req.body], {
-        type: "application/json",
-      })
-      // req.body
-    );
-
+    // form.append('user', req.body);
 
     const resPos = await fetch(`${API_URL}/user/create-new`, {
       
       method: "POST",
+      // headers: {
+      //   Authorization: `Bearer ${token}`,
+      //   'content-type': 'multipart/form-data'
+      // },
       headers: {
         Authorization: `Bearer ${token}`,
-        // 'Content-Type': 'multipart/form-data' 
-      },
-      body: form,
+        'Content-Type': 'application/json',
+    },
+      body: JSON.stringify(req.body()),
     });
 
     const dataPos = await resPos.json();
@@ -81,8 +78,10 @@ async function User(req, res) {
     const dataGet = await resGet.json();
 
     if (!resGet.ok) {
+      console.log("Error is", dataGet.message);
       res.status(500).json({ message: dataGet.message });
     } else {
+      console.log("List use api ", JSON.stringify(dataGet));
       res.status(200).json({ users: dataGet });
     }
   } else if (req.method == "GET") {

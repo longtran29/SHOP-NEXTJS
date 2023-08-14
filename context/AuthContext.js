@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
     } else {
       setUserOrder(dataGet.user.orders);
       console.log("Order user are ", JSON.stringify(dataGet));
-      setUser({role: dataGet.user.roles.map(role  => role.name)});
+      setUser(dataGet.user);
 
       
     }
@@ -77,7 +77,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, error, login, logout, isLoading, userOrder }}
+      value={{ user, error, login, logout, isLoading, userOrder, checkHasLogged }}
     >
       {children}
     </AuthContext.Provider>

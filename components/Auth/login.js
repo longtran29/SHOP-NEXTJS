@@ -72,7 +72,7 @@ export default function Authenticate() {
     if (register) {
       const payload = {
         username: account.username,
-        emai: account.email,
+        email: account.email,
         rePassword: account.rePassword,
         password: account.password,
       };

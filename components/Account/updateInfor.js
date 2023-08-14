@@ -15,6 +15,7 @@ import SpinTip from "../loading/SpinTip";
 import { handleImageUpload } from "@/utils/uploadImage";
 import { NEXT_API } from "@/config";
 import { toast } from "react-toastify";
+import DataContext from "@/context/DataContext";
 
 function UpdateInformation(props) {
   const { children, value, index, ...other } = props;
@@ -22,6 +23,8 @@ function UpdateInformation(props) {
   const { user } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [optionShow, setOptionShow] = useState(false);
+  
   useEffect(() => {
     if (user) {
       console.log("User updare info ", JSON.stringify(user));
@@ -110,9 +113,9 @@ function UpdateInformation(props) {
                           <Image
                             className="rounded-xl"
                             src={
-                              // userData.imgURL
-                              //   ? userData.imgURL :
-                                image.imagePrev
+                              userData.imgURL
+                                ? userData.imgURL
+                                : image.imagePrev
                                 ? image.imagePrev
                                 : logo_upload
                             }
