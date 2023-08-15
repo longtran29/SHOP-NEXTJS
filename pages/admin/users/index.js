@@ -54,18 +54,26 @@ function Products(props) {
     name: "",
     phoneNumber: "",
     enabled: true,
-    roles: null,
-    imgURL: null,
+    roles: [],
   });
+
+  const [imageUser, setImageUser] = useState(null);
+
+  const handleChangeRole = (value) => {
+    console.log(`selected ${value}`);
+    // const newRoles = value.split(",")
+    setNewUser({ ...newUser, roles: value });
+  };
 
   useEffect(() => {
     if (searchValue) {
       setShowUsers(
         allUser.filter(
           (cate) =>
-            cate.email.toLowerCase().includes(searchValue) ||
-            cate.name.toLowerCase().includes(searchValue) ||
-            cate.phoneNumber.toLowerCase().includes(searchValue)
+            cate.email && cate.email.toLowerCase().includes(searchValue) ||
+            cate.name && cate.name.toLowerCase().includes(searchValue) ||
+            (cate.phoneNumber &&
+              cate.phoneNumber.toLowerCase().includes(searchValue))
         )
       );
     } else setShowUsers(allUser);
@@ -87,38 +95,57 @@ function Products(props) {
 
   const changeImage = (event) => {
     const selectedImage = event.target.files[0];
-    setNewUser({ ...newUser, imgURL: selectedImage });
+    setImageUser(selectedImage);
     setImagePreview(URL.createObjectURL(event.target.files[0]));
   };
 
-  // handle confirm form add user
+  // handle confirm form add user++
   const handleOk = async () => {
-    // const formDataToSend = new FormData();
-    // formDataToSend.append("username", newUser.username);
-    // formDataToSend.append("password", newUser.password);
-    // formDataToSend.append("email", newUser.email);
-    // formDataToSend.append("name", newUser.name);
-    // formDataToSend.append("phoneNumber", newUser.phoneNumber);
-    // formDataToSend.append("enabled", newUser.enabled);
-    // formDataToSend.append("imgURL", newUser.imgURL); // Append the image
 
-    const resPut = await fetch(`${NEXT_API}/api/user?action=create_user`, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-    },
+    if(imageUser == null) {
+      toast.error("Upload image profile for user");
+      return;
+    } 
 
-      body: newUser,
-    });
+    const formDataToSend = new FormData();
+
+    formDataToSend.append(
+      "user",
+      JSON.stringify({
+        ...newUser,
+        roles: newUser.roles.map((role) => ({ name: role })),
+      })
+      );
+      formDataToSend.append("imageUser", imageUser);
+      
+      setIsLoading(true);
+    const resPut = await fetch(
+      `${NEXT_API}/api/user/addUser?action=create_user`,
+      {
+        method: "POST",
+        body: formDataToSend,
+      }
+    );
 
     const putData = await resPut.json();
 
     if (!resPut.ok) {
       toast.error(putData.message);
     } else {
+      setUpdate(!update);
       toast.success("Successfull");
     }
     setIsModalOpen(false);
+    setIsLoading(false);
+    setNewUser({
+      username: "",
+      password: "",
+      email: "",
+      name: "",
+      phoneNumber: "",
+      enabled: true,
+      roles: [],
+    });
   };
 
   const handleCancel = () => {
@@ -142,7 +169,6 @@ function Products(props) {
       const dataGet = await resGet.json();
 
       if (!resGet.ok) {
-        
         toast.error("Get user fail");
       } else {
         console.log("List use returned ", JSON.stringify(dataGet.users));
@@ -425,7 +451,7 @@ function Products(props) {
                 mode="multiple"
                 size={size}
                 placeholder="Please select"
-                // onChange={handleChange}
+                onChange={handleChangeRole}
                 style={{
                   width: "100%",
                 }}
@@ -472,6 +498,7 @@ function Products(props) {
           </Grid>
         </Modal>
       </div>
+      {isLoading ? <SpinTip /> : ""}
     </Fragment>
   );
 }
