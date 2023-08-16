@@ -4,7 +4,16 @@ import DataContext from "@/context/DataContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { ExclamationCircleFilled, UserOutlined } from "@ant-design/icons";
 import { Chip, Grid } from "@mui/material";
-import { Image, Input, Modal, Select, Switch, Table, Tag } from "antd";
+import {
+  Breadcrumb,
+  Image,
+  Input,
+  Modal,
+  Select,
+  Switch,
+  Table,
+  Tag,
+} from "antd";
 import React, { Fragment, useContext, useEffect, useState } from "react";
 import { AiOutlineMail } from "react-icons/ai";
 import { BiSolidEdit } from "react-icons/bi";
@@ -70,8 +79,8 @@ function Products(props) {
       setShowUsers(
         allUser.filter(
           (cate) =>
-            cate.email && cate.email.toLowerCase().includes(searchValue) ||
-            cate.name && cate.name.toLowerCase().includes(searchValue) ||
+            (cate.email && cate.email.toLowerCase().includes(searchValue)) ||
+            (cate.name && cate.name.toLowerCase().includes(searchValue)) ||
             (cate.phoneNumber &&
               cate.phoneNumber.toLowerCase().includes(searchValue))
         )
@@ -101,11 +110,10 @@ function Products(props) {
 
   // handle confirm form add user++
   const handleOk = async () => {
-
-    if(imageUser == null) {
+    if (imageUser == null) {
       toast.error("Upload image profile for user");
       return;
-    } 
+    }
 
     const formDataToSend = new FormData();
 
@@ -115,10 +123,10 @@ function Products(props) {
         ...newUser,
         roles: newUser.roles.map((role) => ({ name: role })),
       })
-      );
-      formDataToSend.append("imageUser", imageUser);
-      
-      setIsLoading(true);
+    );
+    formDataToSend.append("imageUser", imageUser);
+
+    setIsLoading(true);
     const resPut = await fetch(
       `${NEXT_API}/api/user/addUser?action=create_user`,
       {
@@ -218,16 +226,17 @@ function Products(props) {
       responsive: ["lg"],
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
+      title: "Mobile | Email",
+      dataIndex: "",
+      key: "",
       responsive: ["lg"],
-    },
-    {
-      title: "Phone number",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-      responsive: ["lg"],
+
+      render: (_, record) => (
+        <div className="flex flex-col items-center ">
+          <h2 className="font-bold">{record.phoneNumber}</h2>
+          <h2>{record.email}</h2>
+        </div>
+      ),
     },
 
     {
@@ -281,9 +290,18 @@ function Products(props) {
       render: (_, record) =>
         record.roles.map((role, index) =>
           role.name == "ROLE_ADMIN" ? (
-            <Chip label={role.name} color="success" key={index} />
+            // <Chip label={role.name} color="success" key={index} />
+            <td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+              <span class="rounded-full bg-yellow-200 px-3 py-1 text-xs font-semibold text-yellow-900">
+                {role.name}
+              </span>
+            </td>
           ) : (
-            <Chip label={role.name} color="primary" key={index} />
+            <td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+              <span class="rounded-full bg-red-200 px-3 py-1 text-xs font-semibold text-red-900">
+                {role.name}
+              </span>
+            </td>
           )
         ),
     },
@@ -307,7 +325,19 @@ function Products(props) {
       {isLoading ? (
         <SpinTip />
       ) : (
-        <div className="p-10">
+        <div className="p-4">
+          <Breadcrumb
+            className="mb-8"
+            items={[
+              {
+                title: <a href="/admin/dashboard">Admin</a>,
+              },
+              {
+                title: <a href="/admin/users">Users</a>,
+              },
+            ]}
+          />
+
           <div className="mb-4">
             <div className="flex justify-between items-center">
               <Search

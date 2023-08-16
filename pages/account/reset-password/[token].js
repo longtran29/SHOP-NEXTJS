@@ -2,14 +2,16 @@ import SpinTip from "@/components/loading/SpinTip";
 import { API_URL } from "@/config";
 import CustomerLayout from "@/layouts/CustomerLayout";
 import { Grid } from "@mui/material";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import forgot_password from "../../../public/images/forgot_password.png"
 
 function UpdatePassword(props) {
   const router = useRouter();
   const { token } = router.query;
-  console.log("Token is " , token);
+  console.log("Token is ", token);
   const [account, setAccount] = useState({
     token: token,
     password: "",
@@ -17,10 +19,10 @@ function UpdatePassword(props) {
   });
 
   useEffect(() => {
-    setAccount((prev) => ({...prev, token: token}))
+    setAccount((prev) => ({ ...prev, token: token }));
   }, [token]);
 
-  console.log("Value token is " , account.token);
+  console.log("Value token is ", account.token);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -102,6 +104,11 @@ function UpdatePassword(props) {
               </button>
             </form>
           </div>
+        </Grid>
+
+        <Grid item xs={6}>
+
+<Image src={forgot_password} width={400} height={400} />
         </Grid>
       </Grid>
     </div>

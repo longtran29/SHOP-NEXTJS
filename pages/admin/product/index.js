@@ -81,23 +81,23 @@ function AddProduct(props) {
   console.log("Dsanh sach la " + JSON.stringify(details));
   // handle fetching cates and brands from DataContext - fetch API async
   useEffect(() => {
-    const brandOpts = listBrands.map((brand) => ({
+    const brandOpts = listBrands && listBrands.map((brand) => ({
       value: brand.id,
       label: brand.name,
     }));
 
-    const cateOpts = listCates.map((cate) => ({
+    const cateOpts = listCates && listCates.map((cate) => ({
       value: cate.id,
       label: cate.name,
     }));
 
-    if (listCates.length > 0 && listBrands.length > 0) {
+    if (listCates &&  listCates.length > 0 && listBrands.length > 0) {
       filterCate(brandOpts[0].value);
     }
 
     // let valueCate = cateOpts.length > 0 ? cateOpts[0].label : "";
 
-    if (listBrands.length > 0 && listCates.length > 0) {
+    if (listBrands &&  listBrands.length > 0 && listCates &&  listCates.length > 0) {
       let valueBrand = brandOpts.length > 0 ? brandOpts[0].label : "";
 
       setState((prevState) => ({

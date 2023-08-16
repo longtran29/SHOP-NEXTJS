@@ -2,7 +2,7 @@ import React, { Fragment, useContext, useEffect, useState } from "react";
 import DataContext from "@/context/DataContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
-import { Badge, Input, Modal, Select, Spin, Table } from "antd";
+import { Badge, Breadcrumb, Input, Modal, Select, Spin, Table } from "antd";
 import { MdDeleteOutline } from "react-icons/md";
 import { toast } from "react-toastify";
 import { NEXT_API } from "@/config";
@@ -220,11 +220,17 @@ function Brands(props) {
       render: (_, record) => (
         <div className="flex items-center">
           {record.categories.map((cate) => (
-         <div className="ml-4">
-           <Button variant="outlined"  startIcon={<Image src={cate.imageUrl} width={20} height={20} className="rounded-full"  />}>
-          {cate.name}
-        </Button>
-          </div>
+            <td class="border-b border-gray-200 bg-white px-5 py-5 text-sm flex ">
+              <Image
+                src={cate.imageUrl}
+                width={20}
+                height={20}
+                className="rounded-full"
+              />
+              <span class="rounded-full bg-red-200 px-3 py-1 text-xs font-semibold text-red-900">
+                {cate.name}
+              </span>
+            </td>
           ))}
         </div>
       ),
@@ -238,7 +244,6 @@ function Brands(props) {
         <h2 className="align-center">{record.categories.length}</h2>
       ),
     },
-
 
     {
       title: "Action",
@@ -269,6 +274,18 @@ function Brands(props) {
       ) : (
         <div className="p-10">
           <div className="mb-4">
+            <Breadcrumb
+              className="mb-8"
+              items={[
+                {
+                  title: <a href="/admin/dashboard">Admin</a>,
+                },
+                {
+                  title: <a href="/admin/brands">Brands</a>,
+                },
+              ]}
+            />
+
             <div className="flex justify-between items-center">
               <Search
                 placeholder="find your brand"

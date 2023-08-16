@@ -110,7 +110,7 @@ function UpdateProduct(props) {
   // handle fetching cates and brands from DataContext - fetch API async
   useEffect(() => {
     // lấy ra các option brand
-    const brandOpts = listBrands.map((brand) => ({
+    const brandOpts = listBrands &&  listBrands.map((brand) => ({
       value: brand.id,
       label: brand.name,
     }));

@@ -1,12 +1,14 @@
 import { API_URL } from "@/config";
 import AuthContext from "@/context/AuthContext";
-import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
+import {  LoadingOutlined } from "@ant-design/icons";
 import { Col, Input, Modal, Row, Spin } from "antd";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SpinTip from "../loading/SpinTip";
+import login_img from "../../public/images/login_img.png"
+import Image from "next/image";
 
 export default function Authenticate() {
   const [account, setAccount] = useState({
@@ -109,13 +111,15 @@ export default function Authenticate() {
     <>
       {" "}
       {loading ? <SpinTip /> : ""}
-      {isLoading ? (
+      {/* {isLoading ? (
         <Spin
           indicator={antIcon}
           className="flex justify-center align-center items-center w-screen h-screen"
         />
       ) : (
-        <Row>
+        
+      )} */}
+      <Row>
           <Col
             flex="800px"
             className="ml-8 background-color background-image background-attachment background-size"
@@ -199,7 +203,7 @@ export default function Authenticate() {
                 </div>
               )}
               <p
-                className="mt-4 hover:cursor-pointer hover:text-gray-600"
+                className=" hover:cursor-pointer hover:text-gray-600"
                 onClick={showModal}
               >
                 Forgot your password
@@ -212,14 +216,8 @@ export default function Authenticate() {
               </button>
             </form>
           </Col>
-          <Col flex="1" className="flex flex-col items-center justify-center">
-            <p>
-              Registering for this site allows you to access your order status
-              and history. Just fill in the fields below, and will get a new
-              account set up for you in no time. We will only ask you for
-              information necessary to make the purchase process faster and
-              easier.
-            </p>
+          <Col flex="1" className="flex flex-col justify-center">
+            <Image src={login_img} width={400} height={400} />
             <button
               className="bg-black text-white p-2 w-1/4"
               onClick={() => setRegister(!register)}
@@ -229,7 +227,6 @@ export default function Authenticate() {
             </button>
           </Col>
         </Row>
-      )}
       <Modal
         title="Forgot password?"
         visible={isModalVisible}

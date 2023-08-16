@@ -1,6 +1,6 @@
 import {  NEXT_API } from "@/config";
 import AdminLayout from "@/layouts/AdminLayout";
-import { Input, Modal, Switch, Table } from "antd";
+import { Breadcrumb, Input, Modal, Switch, Table } from "antd";
 import Image from "next/image";
 import React, { useContext, useEffect, useState } from "react";
 import DataContext from "@/context/DataContext";
@@ -257,7 +257,7 @@ function Categories(props) {
       },
     },
     {
-      title: "Cate",
+      title: "Name",
       dataIndex: "imageUrl",
       key: "imageUrl",
       responsive: ["lg"],
@@ -274,6 +274,15 @@ function Categories(props) {
           </div>
           <span className="ml-20">{record.name}</span>
         </div>
+      ),
+    },
+    {
+      title: "Products",
+      dataIndex: "",
+      key: "",
+      responsive: ["lg"],
+      render: (_, record) => (
+        <h2>{record.products.length}</h2>
       ),
     },
     {
@@ -316,6 +325,20 @@ function Categories(props) {
       ) : (
         <div className="p-10">
           <div className="mb-4">
+          <Breadcrumb
+            className="mb-8"
+            items={[
+           
+            
+              {
+                title: <a href="/admin/dashboard">Admin</a>,
+              },
+              {
+                title: <a href="/admin/categories">Categories</a>,
+              },
+            ]}
+          />
+
             <div className="flex justify-between items-center">
               <Search
                 placeholder="find your category"

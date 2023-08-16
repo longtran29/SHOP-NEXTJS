@@ -12,6 +12,8 @@ export function OrderProvider({ children }) {
   const [paymentMethod, setPaymentMethod] = useState();
   const [orderManagement, setOrderManagement] = useState([]);
 
+  const [statusPayment, setStatusPayment] = useState(false);
+
   const deliverAddress = async () => {
     setState({ ...state, isLoading: true });
     const response = await fetch(`${NEXT_API}/api/user`, {
@@ -49,7 +51,9 @@ export function OrderProvider({ children }) {
     paymentMethod,
     orderManagement: orderManagement ,
     setOrderManagement,
-    updateOrderManagement
+    updateOrderManagement,
+    statusPayment,
+    setStatusPayment
     
   };
 

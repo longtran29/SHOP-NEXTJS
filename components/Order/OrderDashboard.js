@@ -37,24 +37,23 @@ function OrderDashboard(props) {
   // hỗ trợ cho việc lọc , searching input
   const [showOrder, setShowOrder] = useState(data);
 
+  console.log("List order are" , JSON.stringify(showOrder));
+
   const { searchOrderValue, setSearchOrderValue } = useContext(DataContext);
 
   useEffect(() => {
     if (searchOrderValue) {
-      console.log("Da vao day ne  ", JSON.stringify(data) );
+      console.log("Da vao day ne  ", JSON.stringify(data));
       setShowOrder(
         data.filter(
           (order) =>
-            order.user.username.toLowerCase().includes(searchOrderValue) || 
+            order.user.username.toLowerCase().includes(searchOrderValue) ||
             order.address.address.toLowerCase().includes(searchOrderValue) ||
             order.orderStatus.toLowerCase().includes(searchOrderValue) ||
             order.id.includes(searchOrderValue)
         )
       );
-
-   
-    } else 
-    setShowOrder(data);
+    } else setShowOrder(data);
   }, [searchOrderValue, data]);
 
   const handleMaxWidthChange = (event) => {
@@ -94,9 +93,10 @@ function OrderDashboard(props) {
       dataIndex: "id",
       key: "id",
       sortOrder: "ascend",
-      //   sorter: (a, b) => {
-      //     return a.id - b.id > 0 ? 1 : -1;
-      //   },
+        sorter: (a, b) => {
+          // return a.id - b.id > 0 ? 1 : -1;
+          return a.id.localeCompare(b.id)
+        },
     },
     {
       title: "User",
@@ -149,12 +149,20 @@ function OrderDashboard(props) {
       title: "Payment status",
       dataIndex: "payment",
       key: "payment",
-      responsive: ["sm"],
+      responsive: ["lg"],
       render: (_, record) =>
         record.methodPayment == "PAY_PAL" ? (
-          <Chip label="Paid" color="success" />
+          <td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+            <span class="rounded-full bg-red-200 px-3 py-1 text-xs font-semibold text-red-900">
+              Paid
+            </span>
+          </td>
         ) : (
-          <Chip label="Wait for pay" color="primary" />
+          <td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+            <span class="rounded-full bg-red-200 px-3 py-1 text-xs font-semibold text-red-900">
+              Wait for pay
+            </span>
+          </td>
         ),
     },
     {
@@ -235,18 +243,18 @@ function OrderDashboard(props) {
       {value === index && data.length > 0 && (
         <Box sx={{ p: 3 }}>
           <div className="p-10">
-            {
-              showOrder && <Table
-              columns={columns}
-              dataSource={showOrder}
-              pagination={{
-                pageSizeOptions: ["50", "100"],
-                showSizeChanger: true,
-                pageSize: 6,
-              }}
-              rowKey={(record) => record.id}
-            />
-            }
+            {showOrder && (
+              <Table
+                columns={columns}
+                dataSource={showOrder}
+                pagination={{
+                  pageSizeOptions: ["50", "100"],
+                  showSizeChanger: true,
+                  pageSize: 6,
+                }}
+                rowKey={(record) => record.id}
+              />
+            )}
             <div></div>
           </div>
         </Box>

@@ -1,4 +1,4 @@
-import { Layout, Menu, theme } from "antd";
+import { Breadcrumb, Layout, Menu, theme } from "antd";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaUserTag } from "react-icons/fa";
@@ -72,9 +72,8 @@ function Homepage(props) {
           <Menu
             theme="dark"
             mode="inline"
-            
-          defaultSelectedKeys={["2"]}
-          selectedKeys={[current]}
+            defaultSelectedKeys={["2"]}
+            selectedKeys={[current]}
             items={items}
             onClick={handleClick}
           />
@@ -88,6 +87,17 @@ function Homepage(props) {
               background: colorBgContainer,
             }}
           >
+            <Breadcrumb
+              className="mb-8"
+              items={[
+                {
+                  title: <a href="/">Home</a>,
+                },
+                {
+                  title: <a href="/account">Account</a>,
+                },
+              ]}
+            />
             {current == 2 && <Information />}
 
             {current == 3 && <UserOrder />}

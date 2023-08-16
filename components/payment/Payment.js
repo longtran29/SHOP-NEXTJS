@@ -2,6 +2,7 @@ import { API_URL, NEXT_API } from "@/config";
 import CartContext from "@/context/CartContext";
 import OrderContext from "@/context/OrderContext";
 import { PayPalButtons } from "@paypal/react-paypal-js";
+import { useRouter } from "next/router";
 
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
@@ -66,6 +67,19 @@ async function createOrder(cart, address) {
     return postData.data.id;
   }
 }
+
+function Payment(props) {
+
+  const [option, setOption] = useState();
+  const {setPaymentMethod, deliveryAddress, statusPayment, setStatusPayment} = useContext(OrderContext);
+  const {cart} = useContext(CartContext);
+
+  const router = useRouter();
+
+  const { getCart } = React.useContext(CartContext);
+
+
+  
 async function onApprove(data) {
   const resPos = await fetch(`${NEXT_API}/api/checkout/approval`, {
     method: "POST",
@@ -85,15 +99,11 @@ async function onApprove(data) {
     toast.error("Lỗi thanh toán, vui lòng thử lại");
   } else {
     toast.success("Thanh toán thành công !");
-    return postData.data;
+    setStatusPayment(true);
+    router.push("/");
+    getCart();
   }
 }
-
-function Payment(props) {
-
-  const [option, setOption] = useState();
-  const {setPaymentMethod, deliveryAddress} = useContext(OrderContext);
-  const {cart} = useContext(CartContext);
   
 
   const paymentMethod = (e) => {

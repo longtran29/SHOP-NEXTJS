@@ -23,7 +23,8 @@ function Checkout(props) {
 
   const router = useRouter();
 
-  const { deliveryAddress, paymentMethod } = React.useContext(OrderContext);
+  const { deliveryAddress, paymentMethod, statusPayment, setStatusPayment } =
+    React.useContext(OrderContext);
   console.log("Address is " + JSON.stringify(deliveryAddress));
 
   const { setCart, getCart } = React.useContext(CartContext);
@@ -90,8 +91,16 @@ function Checkout(props) {
   };
 
   const finishPayment = async () => {
-    if (deliveryAddress == null)
-      toast.error("Bạn chưa chọn địa chỉ giao hàng !");
+    if (deliveryAddress == null) {
+      toast.error("Choose your delivery address at the second step !");
+      return;
+    }
+
+    if (paymentMethod == null) {
+      toast.error("Choose your method payment !");
+      return;
+    }
+
     if (paymentMethod === "CASH") {
       const resPos = await fetch(`${NEXT_API}/api/checkout`, {
         method: "POST",
@@ -109,15 +118,13 @@ function Checkout(props) {
       const postData = await resPos.json();
 
       if (!resPos.ok) {
-        toast.error("Lỗi, vui lòng thử lại ");
+        toast.error("Lỗi, vui lòng thử lại " + postData.message);
       } else {
         toast.success("Đặt hàng thành công !");
+        setStatusPayment(true);
         getCart();
         router.push("/");
       }
-    } else {
-      getCart();
-      router.push("/");
     }
   };
 
@@ -178,9 +185,6 @@ function Checkout(props) {
             {activeStep !== steps.length - 1 && (
               <Button onClick={handleNext}>Next</Button>
             )}
-            {/* <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? "Finish" : "Next"}
-            </Button> */}
           </Box>
         </React.Fragment>
       )}

@@ -9,7 +9,7 @@ import OrderDashboard from "@/components/Order/OrderDashboard";
 import AdminLayout from "@/layouts/AdminLayout";
 import OrderContext from "@/context/OrderContext";
 import DataContext from "@/context/DataContext";
-import { Input } from "antd";
+import { Breadcrumb, Input } from "antd";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -100,6 +100,20 @@ export default function Orders() {
   return (
     <div className="p-4">
       <div className="mb-4 mt-4">
+      <Breadcrumb
+            className="mb-8"
+            items={[
+           
+            
+              {
+                title: <a href="/admin/dashboard">Admin</a>,
+              },
+              {
+                title: <a href="/admin/orders">Orders</a>,
+              },
+            ]}
+          />
+
         <div className="flex justify-between items-center">
           <Search
             placeholder="find order based id/ username / address / status order"

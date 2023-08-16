@@ -5,6 +5,7 @@ import DataContext from "@/context/DataContext";
 import SpinTip from "../loading/SpinTip";
 import { useRouter } from "next/router";
 import AuthContext from "@/context/AuthContext";
+import { deepPurple } from "@mui/material/colors";
 
 function DeliveryAddressForm(props) {
   const { addNewAddress, userInfo, getUserInformation, isLoading } = useContext(DataContext);
@@ -33,7 +34,7 @@ function DeliveryAddressForm(props) {
     addNewAddress(address);
   };
   return (
-    <div className="mt-8 p-4">
+    <div className="p-4">
       {
         userInfo != null && <>
         {isLoading? <SpinTip /> : <Grid container spacing={2} className="mt-4">
@@ -47,9 +48,9 @@ function DeliveryAddressForm(props) {
             {
               userInfo.addresses.map((address, index) => <AddressCard data={address} key={index} />)
             }
-            <Button className="mt-5 bg-primary-600 text-white" type="button" onClick={() => router.push("/checkout?step=2")}>
+            <button className="hover:cursor-pointer mt-4 bg-primary-400 text-white font-semibold px-4 py-1.5 rounded-sm" type="button" onClick={() => router.push("/checkout?step=2")}>
               DELIVERY HERE
-            </Button>
+            </button>
           </div>
         </Grid>
         <Grid item container xs={12} sm={7}>
@@ -113,9 +114,9 @@ function DeliveryAddressForm(props) {
                   />
                 </Grid>
               </Grid>
-              <Button className="mt-5 bg-primary-600 text-white" type="submit">
+              <button  className="hover:cursor-pointer mt-4 bg-primary-400 text-white font-semibold px-4 py-1.5 rounded-sm" type="submit">
                 ADD ADDRESS
-              </Button>
+              </button>
             </form>
           </Box>
         </Grid>

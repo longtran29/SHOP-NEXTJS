@@ -5,7 +5,7 @@ import { useFilterContext } from "@/context/FilterContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
 import { Chip } from "@mui/material";
-import { Image, Input, Modal, Spin, Switch, Table, Tag } from "antd";
+import { Breadcrumb, Image, Input, Modal, Spin, Switch, Table, Tag } from "antd";
 import { useRouter } from "next/router";
 import React, { Fragment, useContext, useState, useEffect } from "react";
 import { BiSolidEdit } from "react-icons/bi";
@@ -153,11 +153,14 @@ function Products(props) {
     },
 
     {
-      title: "Category",
+      title: "Category | Brand",
       dataIndex: "category",
       key: "category",
       responsive: ["lg"],
-      render: (_, record) => <h2>{record.category.name}</h2>,
+      render: (_, record) => <div className="flex flex-col justify-center items-center">
+      <h2>{record.category.name}</h2>
+      <h2 className="font-semibold">{record.brand.name}</h2>
+      </div>,
     },
     {
       title: "Price",
@@ -223,6 +226,20 @@ function Products(props) {
       ) : (
         <div className="p-10">
           <div className="mb-4">
+          <Breadcrumb
+            className="mb-8"
+            items={[
+           
+            
+              {
+                title: <a href="/admin/dashboard">Admin</a>,
+              },
+              {
+                title: <a href="/admin/products">Products</a>,
+              },
+            ]}
+          />
+
             <div className="flex justify-between items-center">
               <Search
                 placeholder="find your product based name/ category name"
