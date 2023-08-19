@@ -9,6 +9,8 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import SpinTip from "@/components/loading/SpinTip";
 import { BiSolidEdit } from "react-icons/bi";
+import { handleImageUpload } from "@/utils/uploadImage";
+
 
 function Categories(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
