@@ -74,6 +74,7 @@ const callbacks = {
 const options = {
   providers,
   callbacks,
+  secret: process.env.NEXT_PUBLIC_SECRET,
   pages: {
     error: '/login' // Changing the error redirect page to our custom login page
   }
