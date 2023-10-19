@@ -1,7 +1,7 @@
-import {  API_URL, NEXT_API } from "@/config";
+import { API_URL, NEXT_API } from "@/config";
 import AdminLayout from "@/layouts/AdminLayout";
 import { Breadcrumb, Image, Input, Modal, Switch, Table } from "antd";
-import React, { useContext, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import DataContext from "@/context/DataContext";
 import { MdDeleteOutline } from "react-icons/md";
 import { ExclamationCircleFilled } from "@ant-design/icons";
@@ -11,7 +11,6 @@ import { BiSolidEdit } from "react-icons/bi";
 import { handleImageUpload } from "@/utils/uploadImage";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-
 
 function Categories(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,17 +39,15 @@ function Categories(props) {
   const { Search } = Input;
 
   const router = useRouter();
-  
+
   const { data: session } = useSession();
   const token = session?.accessToken;
 
   useEffect(() => {
-
-    if(session?.role == "CUSTOMER") {
-      router.push("/unauthorized")
+    if (session?.role == "CUSTOMER") {
+      router.push("/unauthorized");
     }
-  } , [session]);
-
+  }, [session]);
 
   let imgUrl = "";
 
@@ -94,32 +91,25 @@ function Categories(props) {
   // update status
   const updateStatus = async (categoryId, status) => {
     // ver
-    const resPut2 = await fetch(
-      `${API_URL}/categories/status/${categoryId}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: status,
-        }),
-      }
-    );
+    const resPut2 = await fetch(`${API_URL}/categories/status/${categoryId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: status,
+      }),
+    });
 
     const dataPut2 = await resPut2.json();
 
     if (!resPut2.ok) {
-      toast.error(dataPut2.message );
-      
+      toast.error(dataPut2.message);
     } else {
-      
       updateCategories(dataPut2);
       status ? toast.info("Disabled") : toast.success("Enabled !");
-    
     }
-
   };
 
   // handle delete
@@ -139,16 +129,15 @@ function Categories(props) {
               Authorization: `Bearer ${token}`,
             },
           });
-    
+
           const delData = await resDel.json();
-    
+
           if (!resDel.ok) {
             toast.error(delData.message);
-            
-          } else {    getCategories();
+          } else {
+            getCategories();
             toast.success("Xoá thành công");
           }
-
         };
 
         deleteCate();
@@ -157,14 +146,12 @@ function Categories(props) {
     });
   };
 
-
   // export to excel file
   const exportToExcelFile = async () => {
     const url = `${API_URL}/categories/download`;
 
-    window.location = url
-
-  }
+    window.location = url;
+  };
 
   // handle submit
   const handleOk = async () => {
@@ -190,33 +177,39 @@ function Categories(props) {
           toast.error(error);
           return;
         });
-      
-      // updated ver
+
+      // updated ver add new category
+      let payload = {
+        name: state.categoryName,
+        enabled: true,
+      };
+
+      let formData = new FormData();
+
+      let json = JSON.stringify(payload);
+      let blob = new Blob([json], {
+        type: "application/json",
+      });
+
+      formData.append("category", blob);
+      formData.append("image", state.imageData);
+
       const resPos = await fetch(`${API_URL}/categories`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: state.categoryName,
-          enabled: true,
-          imageUrl: imgUrl,
-        }),
+        body: formData,
       });
 
       const postData = await resPos.json();
 
       if (!resPos.ok) {
         toast.error(postData.message);
-        
       } else {
+        toast.success("Added !");
         // res.status(200).json({ categories: postData });
       }
-
-
-
-
     } else {
       // cap nhat danh muc
       const categoryId = state.categoryId;
@@ -238,29 +231,36 @@ function Categories(props) {
         ).imageUrl;
       }
 
-      
-    // ver
-    const resPut = await fetch(`${API_URL}/categories/${categoryId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+      // ver update category
+      const payload = {
         name: state.categoryName,
-        imageUrl: imgUrl,
-        enabled: state.status,
-      }),
-    });
+        enabled: state.status
+      }
+      const formData = new FormData();
 
-    const dataPut = await resPut.json();
+      const json = JSON.stringify(payload);
+      const blob = new Blob([json], {
+        type: "application/json",
+      });
 
-    if (!resPut.ok) {
-      toast.error(dataPut.message );
-      
-    } else {
-      toast.success("Update successful !");
-    }
+      formData.append("category", blob);
+      formData.append("image", state.imageData);
+
+      const resPut = await fetch(`${API_URL}/categories/${categoryId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const dataPut = await resPut.json();
+
+      if (!resPut.ok) {
+        toast.error(dataPut.message);
+      } else {
+        toast.success("Updated !");
+      }
     }
 
     getCategories();
@@ -310,24 +310,17 @@ function Categories(props) {
       render: (_, record) => (
         <div className="flex">
           <div className="h-[2rem] w-[2rem]">
-            {/* <Image
-              alt={record.imageUrl}
-              src={record.imageUrl}
-              height={80}
-              width={80}
-              className="w-full h-auto object-cover"
-            /> */}
-               <Image
-            className="rounded-full border border-white border-solid"
-            alt="avatar"
-            src={
-              record.imageUrl
-                ? record.imageUrl
-                : "https://th.bing.com/th/id/OIP.srdjU7JjdeYDjK46AQVGKwHaHa?pid=ImgDet&w=200&h=200&c=7&dpr=1.3"
-            }
-            height={40}
-            width={40}
-          />
+            <Image
+              className="rounded-full border border-white border-solid"
+              alt="avatar"
+              src={
+                record.imageUrl
+                  ? record.imageUrl
+                  : "https://th.bing.com/th/id/OIP.srdjU7JjdeYDjK46AQVGKwHaHa?pid=ImgDet&w=200&h=200&c=7&dpr=1.3"
+              }
+              height={40}
+              width={40}
+            />
           </div>
           <span className="ml-20">{record.name}</span>
         </div>
@@ -338,9 +331,7 @@ function Categories(props) {
       dataIndex: "",
       key: "",
       responsive: ["lg"],
-      render: (_, record) => (
-        <h2>{record.products.length}</h2>
-      ),
+      render: (_, record) => <h2>{record.products.length}</h2>,
     },
     {
       title: "Enabled",
@@ -376,17 +367,13 @@ function Categories(props) {
   ];
 
   return (
-    <>
-      {isLoading ? (
-        <SpinTip />
-      ) : (
-        <div className="p-10">
-          <div className="mb-4">
+    <Fragment>
+      {/* start content body */}
+      <div className="p-10">
+        <div className="mb-4">
           <Breadcrumb
             className="mb-8"
             items={[
-           
-            
               {
                 title: <a href="/admin/dashboard">Admin</a>,
               },
@@ -396,26 +383,23 @@ function Categories(props) {
             ]}
           />
 
-            <div className="flex justify-between items-center">
-              <Search
-                placeholder="find your category"
-                enterButton="Search"
-                size="large"
-                className="w-1/3"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-              />
+          <div className="flex justify-between items-center">
+            <Search
+              placeholder="find your category"
+              enterButton="Search"
+              size="large"
+              className="w-1/3"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
 
-<div className="flex">
-
-
-<button
+            <div className="flex">
+              <button
                 className="text-white bg-primary-500 hover:bg-pimary-600 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto mr-4"
                 onClick={() => exportToExcelFile()}
               >
                 Export to excel
               </button>
-
 
               <button
                 className="text-white bg-primary-500 hover:bg-pimary-600 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2 text-center sm:ml-auto"
@@ -430,27 +414,30 @@ function Categories(props) {
                 </svg>
                 Add category
               </button>
-
-
-</div>
-
-          
             </div>
           </div>
-          {showCate ? (
-            <Table
-              columns={columns}
-              dataSource={showCate}
-              pagination={{
-                pageSizeOptions: ["50", "100"],
-                showSizeChanger: true,
-                pageSize: 6,
-              }}
-              rowKey={(record) => record.id}
-            />
-          ) : (
-            <SpinTip />
-          )}
+        </div>
+
+        {showCate ? (
+          <Table
+            columns={columns}
+            dataSource={showCate}
+            pagination={{
+              pageSizeOptions: ["50", "100"],
+              showSizeChanger: true,
+              pageSize: 6,
+            }}
+            rowKey={(record) => record.id}
+          />
+        ) : (
+          <SpinTip />
+        )}
+
+        {/* start modal */}
+
+        {loading ? (
+          <SpinTip />
+        ) : (
           <div>
             <Modal
               className="p-4 mt-20"
@@ -489,7 +476,6 @@ function Categories(props) {
                       height={60}
                       id="imagePreview"
                       src={state.imagePreview}
-                      // alt={state.imageData.name}
                       alt="image_preview"
                     />
                   </div>
@@ -497,10 +483,12 @@ function Categories(props) {
               </div>
             </Modal>
           </div>
-        </div>
-      )}
-      {loading ? <SpinTip /> : ""}
-    </>
+        )}
+
+        {/* end modal */}
+      </div>
+      {/* end content */}
+    </Fragment>
   );
 }
 
