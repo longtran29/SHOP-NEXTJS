@@ -3,11 +3,16 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Fragment } from "react";
 import SpinTip from "../loading/SpinTip";
+import { useSession } from "next-auth/react";
 
 function ProductCard(props) {
   const { productDetails } = props;
 
-  const router = useRouter();
+  
+  const { data: session } = useSession();
+  const token = session?.accessToken;
+
+
 
   return (
    <Fragment>
@@ -40,7 +45,9 @@ function ProductCard(props) {
       </p>
       <a className="wsus__pro_name" href={`/product/detail/${productDetails.id}`}>  {productDetails.name}</a>
       <p className="wsus__price">${productDetails.original_price}</p>
-      <a className="add_cart" href="#">add to cart</a>
+      {
+        session?.role == "ADMIN" ? "" : <a className="add_cart" href="#">add to cart</a>
+      }
     </div>
   </div>
 </div>: <SpinTip />

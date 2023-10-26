@@ -1,13 +1,11 @@
 import ProductCard from "@/components/Product/ProductCard";
 import DataContext from "@/context/DataContext";
 import CustomerLayout from "@/layouts/CustomerLayout";
-import "react-alice-carousel/lib/alice-carousel.css";
 import { useContext, useEffect, useState } from "react";
 import SpinTip from "@/components/loading/SpinTip";
 import { toast } from "react-toastify";
 import { API_URL, NEXT_API } from "@/config";
-import { useSession } from "next-auth/react";
-import Cookies from 'universal-cookie';
+import { signOut, useSession } from "next-auth/react";
 const style = {
   background: "#0092ff",
   padding: "8px 0",
@@ -19,11 +17,6 @@ function Home(props) {
 
   const [loading, setLoading] = useState(false);
 
-  const responsive = {
-    0: { items: 1 },
-    568: { items: 3 },
-    1024: { items: 5 },
-  };
 
   useEffect(() => {
     (async () => {
@@ -868,8 +861,8 @@ function Home(props) {
                       <li>
                         <a href="/account">my account</a>
                       </li>
-                      <li onClick={handleLogout}>
-                        <a >Logout</a>
+                      <li>
+                        <a href="#"  onClick={() => signOut({ callbackUrl: `${window.location.origin}/account/login` })}>Logout</a>
                       </li>
                     </>
                   ) : (

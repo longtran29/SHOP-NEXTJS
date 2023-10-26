@@ -62,6 +62,7 @@ export default function App({
         <script type="text/javascript" src="/js/popper.js"></script>
         <script type="text/javascript" src="/js/tooltip.js"></script>
         <script type="text/javascript" src="/js/moment.min.js"></script>
+        <script type="text/javascript" src="/js/bootstrap-modal.js"></script>
         <script
           type="text/javascript"
           src="/js/jquery.nicescroll.min.js"
@@ -70,7 +71,7 @@ export default function App({
         <script type="text/javascript" src="/js/scripts.js"></script>
         <script type="text/javascript" src="/js/custom.js"></script>
 
-        <script async defer crossOrigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+        {/* <script async defer crossOrigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script> */}
 
         <script
             type="text/javascript"

@@ -6,7 +6,7 @@ import { Select } from "antd";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import DataContext from "@/context/DataContext";
-import { API_URL, NEXT_API } from "@/config";
+import { API_URL } from "@/config";
 import { toast } from "react-toastify";
 import router from "next/router";
 import SpinTip from "@/components/loading/SpinTip";
@@ -32,6 +32,8 @@ function UpdateProduct(props) {
 
   const router = useRouter();
 
+  const [pathName, setPathName] = useState(router.asPath);
+
   const { listBrands, listCates, getProductAdmin, adminProducts } =
     useContext(DataContext);
 
@@ -40,16 +42,16 @@ function UpdateProduct(props) {
   const [product, setProduct] = useState(null);
 
   
-  const { data: session } = useSession();
+  const { data: session , status} = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push("/account/login")
+    },
+  });
   const token = session?.accessToken;
 
 
-  useEffect(() => {
 
-    if(session?.role == "CUSTOMER") {
-      router.push("/unauthorized")
-    }
-  } , [session]);
 
     useEffect(() => {
 
@@ -222,6 +224,12 @@ function UpdateProduct(props) {
 
     setState({ ...state, isLoading: false });
   };
+
+  
+  if(status === "loading") {
+    return <SpinTip />
+  } else 
+
 
   return (
     <div className="p-10 border-2 border-solid">

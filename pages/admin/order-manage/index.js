@@ -12,6 +12,7 @@ import OrderContext from "@/context/OrderContext";
 import DataContext from "@/context/DataContext";
 import { Breadcrumb, Input } from "antd";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -57,17 +58,15 @@ export default function Orders() {
     setValue(newValue);
   };
 
-  
-  const { data: session } = useSession();
+  const router = useRouter();
+
+  const { data: session , status} = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push("/account/login")
+    },
+  });
   const token = session?.accessToken;
-
-
-  useEffect(() => {
-
-    if(session?.role == "CUSTOMER") {
-      router.push("/unauthorized")
-    }
-  } , [session]);
 
 
 
@@ -114,6 +113,12 @@ export default function Orders() {
         );
     }
   };
+
+  
+  if(status === "loading") {
+    return <SpinTip />
+  } else 
+
 
   return (
     <div className="p-4">
