@@ -6,7 +6,6 @@
 
 // export const API_URL = "https://ecommerceelectronic.azurewebsites.net/api/v1"
 
-export const API_URL = "http://localhost:8080/api/v1"
+export const API_URL = "https://long-electronic.onrender.com/api/v1"
 
-export const NEXT_API =
-  "https://long-electronic.onrender.com/"
+export const NEXT_API = "http://localhost:3000/"
